@@ -1,0 +1,26 @@
+.emailCk{
+    display: flex;
+    position: relative;
+    height: 200px;
+    background-color: rgba(245, 222, 179, 0.4);
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    .pEmail{
+        color: red;
+        text-align: center;
+    }
+    
+    button{
+        position: absolute;
+        right: 3%;
+        bottom: 2%;
+        color: rgba(97, 112, 247, 0.829);
+        background-color: rgba(240, 255, 255, 0);
+        border-color: rgba(240, 255, 255, 0);
+        &:hover{
+            color: rgba(180, 240, 132, 0.76);
+        }
+    }
+    
+}

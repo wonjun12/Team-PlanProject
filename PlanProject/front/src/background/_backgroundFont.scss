@@ -1,0 +1,59 @@
+%fontFalse {
+    -ms-user-select: none; 
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;   
+}
+
+@mixin backSetting {
+    div{
+        overflow: hidden;
+        @content;
+    }
+}
+
+@mixin snowSetting ($key) {
+    position: absolute;
+
+    color: white;
+
+    animation: $key 17s ease-in-out infinite;
+}
+
+@mixin name {
+    
+}
+
+@mixin fallDown {
+    @keyframes fallDownLeft {
+        0%{
+            margin-top: 0;
+        }
+        10%, 30%, 50%, 70%, 90%{
+            margin-left: 5%;
+        }
+        20%, 40%, 60%, 80%{
+            margin-left: 0%;
+        }
+        100%{
+            margin-left: 0%;
+            margin-top: 95vh;
+        }
+    }
+    @keyframes fallDownRight {
+        0%{
+            margin-top: 0;
+        }
+        10%, 30%, 50%, 70%, 90%{
+            margin-left: -5%;
+        }
+        20%, 40%, 60%, 80%{
+            margin-left: 0%;
+        }
+        100%{
+            margin-left: 0%;
+            margin-top: 95vh;
+        }
+    }
+}

@@ -1,0 +1,81 @@
+.container{
+  width: 1500px;
+  height: 850px;
+  border: 1px solid white;  
+  position: relative;
+  .prevBtn{
+    position: absolute;
+    left: 0;
+    font-size: 50px;
+    z-index: 999;
+  }
+  .nextBtn{
+    position: absolute;
+    right: 0;
+    font-size: 50px;
+    z-index: 999;
+  }
+  .navDiv{
+    height: 80px;
+    display: flex;
+    flex: nowrap;
+    overflow: hidden;
+    background-color: white;
+    div{
+      height: 80px;
+      min-width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.5s ease-in-out;
+    }
+    .dayNavDiv{
+      min-width: 20%;
+    }
+  }
+  .titleDiv{
+    height: 50px;
+    text-align: center;
+    background-color: aquamarine;
+    position: relative;
+    h1{
+      font-size: 30px;
+      margin: 0;
+    }
+    .backBtn{
+      position: absolute;
+      top: 10px;
+      left: 5px;
+      font-size: 20px;
+      z-index: 999;
+      background-color: cornflowerblue;
+      color: white;
+    }
+  }
+  .contentDiv{
+    height: 720px;
+    width: 1500px;
+    display: flex;
+    .mapDiv{
+      height: 100%;
+      width: 100%;
+      background-color: antiquewhite;
+    }
+    .plansDiv{
+      height: 100%;
+      width: 100%;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      .planWrap{
+        overflow-y: auto;
+        .planDiv{
+          display: flex;
+          flex-direction: column;
+          padding: 15px;
+          border: 1px solid;
+        }
+      }
+    }
+  }
+}

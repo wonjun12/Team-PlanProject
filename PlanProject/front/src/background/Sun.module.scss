@@ -1,0 +1,20 @@
+@import "backgroundFont";
+
+@include backSetting {
+    .sunDiv {
+        @extend %fontFalse;
+        position: absolute;
+        color: #f4cccc;
+        font-size: 120px;
+        animation: sunMove infinite 10s linear;
+    }
+}
+
+@keyframes sunMove {
+    from{
+        transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(360deg);
+    }
+}

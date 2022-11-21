@@ -1,0 +1,17 @@
+body{
+    margin: 0px;
+}
+.mainDiv{
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+.App{
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+}
