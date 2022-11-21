@@ -1,0 +1,23 @@
+@import "backgroundFont";
+
+@include backSetting {
+    .rainDiv{
+        @extend %fontFalse;
+        @keyframes fallDown {
+            0% {
+                margin-top: 0;
+            }
+            100%{
+                margin-top: 95vh;
+            }
+        } 
+        position: absolute;
+    
+        color: white;
+
+        top: 10px;
+
+
+        animation: fallDown 3s ease-in-out infinite;
+    }
+}

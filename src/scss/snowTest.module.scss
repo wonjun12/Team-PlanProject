@@ -1,0 +1,15 @@
+@import "./backgroundFont";
+
+@include backSetting {
+    .snowDiv{
+        @extend %fontFalse;
+        @include snowSetting(fallDownRight);
+        
+    }
+    .snowDiv2{
+        @extend %fontFalse;
+        @include snowSetting(fallDownLeft);
+    }
+}
+
+@include fallDown;

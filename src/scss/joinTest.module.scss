@@ -1,0 +1,27 @@
+@import "mainLogin";
+.joinForm{
+    animation: joinChange 3s ease;
+    @include joinDiv;
+}
+.joinFormBack{
+    animation: joinChangeBack 3s ease;
+    @include joinDiv;
+}
+
+@keyframes joinChange {
+    from{
+        transform: rotateY(90deg);
+    }
+    to{
+        transform: rotateY(0deg);
+    }  
+}
+
+@keyframes joinChangeBack {
+    from{
+        transform: rotateY(0deg);
+    }
+    to{
+        transform: rotateY(90deg);
+    }
+}

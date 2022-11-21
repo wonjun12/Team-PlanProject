@@ -1,0 +1,16 @@
+@import "../scss/mainLogin";
+.selectDiv {
+    @extend %pointDiv;
+
+    animation: selectView 3s ease;
+    
+}
+
+@keyframes selectView {
+    from{
+        transform: rotateY(90deg);
+    }
+    to{
+        transform: rotateY(0deg);
+    }
+}
