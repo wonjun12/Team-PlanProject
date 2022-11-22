@@ -1,0 +1,22 @@
+.loginFailed{
+    z-index: 5;
+    position: absolute;
+    width: 250px;
+    height: 50px;
+    color:rgb(219, 0, 0);
+    font-size: 17px;
+    animation: hideFailed 5s forwards;
+
+    visibility: hidden;
+}
+
+@keyframes hideFailed {
+    10%{
+        visibility: visible;
+        opacity: 1;
+    }
+    100%{
+        visibility: hidden;
+        opacity: 0;
+    }
+}

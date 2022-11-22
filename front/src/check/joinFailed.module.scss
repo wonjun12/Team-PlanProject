@@ -1,0 +1,17 @@
+.joinFailed{
+    position: absolute;
+    animation: colorChange 6s alternate infinite;
+}
+
+@keyframes colorChange {
+    0%{
+        color: rgba(51, 50, 50, 0.904);
+    }
+    50%{
+        color: rgba(122, 124, 240, 0.781);
+    }
+    100%{
+        color:rgba(241, 56, 56, 0.795);
+    }
+    
+}

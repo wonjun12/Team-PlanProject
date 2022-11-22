@@ -1,0 +1,33 @@
+@import "../setUser/mainLogin";
+.selectDiv {
+    @extend %pointDiv;
+    animation: selectView 3s ease;
+    width: 400px;
+    height: 150px;
+    div{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        button{
+            background-color: rgba(0,0,0,0);
+            border-color: rgba(0,0,0,0);
+            width: 50%;
+            font-size: 20px;
+            color: rgba(31, 30, 30, 0.89);
+            &:hover{
+                background-color: rgba(154, 206, 159, 0.562);
+            }
+        }
+        
+    }
+}
+
+@keyframes selectView {
+    from{
+        transform: rotateY(90deg);
+    }
+    to{
+        transform: rotateY(0deg);
+    }
+}

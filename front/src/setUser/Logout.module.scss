@@ -1,0 +1,14 @@
+.logout{
+    position: absolute;
+    right: 0%;
+    bottom: 0%;
+    border-radius: 15px;
+    border-color: rgba(0,0,0,0);
+    transition: background-color 2.5s ease-in-out;
+    img{
+        width: 80px;
+    }
+    &:hover{
+        background-color: rgba(202, 230, 216, 0.432);
+    }
+}
