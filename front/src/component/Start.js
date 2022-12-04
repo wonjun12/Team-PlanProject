@@ -15,7 +15,7 @@ const Start = () => {
   const startPostFnc = ()=> {
     //start post
     console.log(startPlan);
-    setViewCont("STEP2");
+    setViewCont("STEP3");
   }
 
   return (

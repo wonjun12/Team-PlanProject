@@ -27,7 +27,7 @@
       font-size: 20px;
       font-weight: bold;
       height: 80px;
-      min-width: 50%;
+      min-width: 500px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -71,11 +71,20 @@
       background-color: white;
       display: flex;
       flex-direction: column;
+      .settingWrap{
+        @include responsive("settingDiv");
+      }
       .startWrap{
-        @include responsive("fullDiv");
+        @include responsive("startDiv");
       }
       .logdingWrap{
-        @include responsive("scrollDiv");
+        @include responsive("logdingDiv");
+      }
+      .planWrap{
+        @include responsive("dayPlanDiv");
+      }
+      .lastPlanWrap{
+        @include responsive("dayPlanDiv");
       }
     }
   }

@@ -1,0 +1,84 @@
+1. SetPlan
+{
+  title: '여행 제목',
+  start: '2022-12-04',
+  end: '2022-12-10'
+}
+
+
+2. Start
+{
+  address: '인천 가좌동', 
+  time: '13:02', 
+  transportation: 'car', 
+  memo: '출발 메모'
+}
+
+3. Logding
+{[
+  {
+    address: "인천 가좌동",
+    check_in: "2022-12-04",
+    check_out: "2022-12-05",
+    memo: "숙소 메모",
+    price: "100000"
+    reservation: true
+  },
+  {
+    address: "",
+    check_in: "",
+    check_out: "",
+    memo: "",
+    price: ""
+    reservation: false
+  },
+  ...
+]}
+
+4. DayPlan (하루 일정)
+{[
+  {
+    order: true // 숙소 도착 전후 
+    address: "인천 가좌동",
+    location: "땡땡카페",
+    reservation: true,
+    price: "10000",
+    time: "분단위"
+    memo: "일정 메모"
+  },
+  {
+    order: ""
+    address: "",
+    location: "",
+    reservation: "",
+    price: "",
+    time: ""
+    memo: ""
+  },
+  ...
+]}
+
+5. LastPlan (마지막 날)
+{
+  {
+    lastLocation: "최종 도착지 이름",
+    lastAddress: "최종 도착지 주소"
+  },
+  [{
+    address: "인천 가좌동",
+    location: "땡땡카페",
+    reservation: true,
+    price: "10000",
+    time: "분단위"
+    memo: "일정 메모"
+  },
+  {
+    address: "",
+    location: "",
+    reservation: "",
+    price: "",
+    time: ""
+    memo: ""
+  },
+  ...]
+}

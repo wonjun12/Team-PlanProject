@@ -1,5 +1,9 @@
 @mixin responsive($step) {
-  @if $step == 'fullDiv' {
+
+  @if $step == 'settingDiv'{
+    
+  }
+  @if $step == 'startDiv' {
     //STEP1 
     p{
       display: flex;
@@ -26,8 +30,8 @@
       }
     }
   }
-  @if $step == 'scrollDiv' {
-    //STEP2 , 일별 일정
+  @if $step == 'logdingDiv' {
+    //STEP2
     overflow-y: auto;
     .logdingDiv{
 
@@ -35,6 +39,7 @@
         font-size: 20px;
         font-weight: bold;
       }
+
       input,select,textarea{
         font-size: 20px;
         margin-bottom: 10px;
@@ -92,6 +97,102 @@
         input[type='number']{
           margin: 0;
           width: 200px;
+        }
+      }
+      .deleteBtn{
+        width: 100px;
+        align-self: flex-end;
+      }
+    }
+  }
+  @if $step == 'dayPlanDiv' { 
+    //일별 일정
+    overflow-y: auto;
+    .planDiv{
+      label{
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input, textarea{
+        font-size: 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+      }
+      input[type='checkbox'], input[type='radio']{
+        width: 20px;
+        height: 20px;
+      }
+      .openDiv{
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+        p{
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+        }
+        .openSpan{
+          position: absolute;
+          font-size: 40px;
+          top: -10px;
+          right: 0;
+        }
+      }
+      border: 1px solid;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+
+      .orderDiv{
+        width: 100%;
+        margin-bottom: 5px;
+        label{
+          margin-right: 150px;
+        }
+      }
+      .locationDiv{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        .timeDiv{
+          display: flex;
+          input{
+            width: 150px;
+          }
+        }
+      }
+
+      .detailBtnDiv{
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+        p{
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+        }
+        span{
+          position: absolute;
+          font-size: 40px;
+          top: -10px;
+          right: 0;
+        }
+      }
+
+      .detailDiv{
+        display: flex;
+        width: 100%;
+        label{
+          margin-right: 50px;
+        }
+        input[type='number']{
+          width: 250px;
         }
       }
       .deleteBtn{

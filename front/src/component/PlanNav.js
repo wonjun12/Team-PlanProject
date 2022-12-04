@@ -9,15 +9,13 @@ const PlanNav = () => {
   const { viewCont, setViewCont, baseData } = useContext(ThemeContext);
 
   //nav 항목
-  const [startNav, setStartNav] = useState(["STEP1", "STEP2"]);
+  const [startNav, setStartNav] = useState(["STEP1", "STEP2", "STEP3"]);
   const [dateNav, setDateNav] = useState([]);
-  //getParams
-  const { start, end, days, title } = useParams();
 
-
+  //날짜 설정
   const setDate = () => {
     let navArr = [];
-    let navDate = new Date(baseData.start.substring(0, start.length - 2));
+    let navDate = new Date(baseData.start.substring(0, baseData.start.length - 2));
     for (let i = 1; i <= parseInt(baseData.days); i++) {
       navArr.push(
         `${navDate.getMonth() + 1}월${navDate.getDate()}일`
@@ -33,7 +31,7 @@ const PlanNav = () => {
     //console.log(idx);
   }
 
-  //Nav 화살표 이동==================
+  //Nav 화살표 이동
   const navPrevFnc = () => {
     if (currentIndex !== 0) {
       setCurrentIndex(currentIndex - 1);
@@ -44,7 +42,19 @@ const PlanNav = () => {
       setCurrentIndex(currentIndex + 1);
     }
   }
-  //====================================
+  
+  //현재 일정날짜에 따라 nav 위치 변경
+  useEffect(() => {
+    if(typeof(viewCont) === 'number'){
+
+      if(viewCont > 4 && viewCont > (currentIndex + 4)) {
+        setCurrentIndex(viewCont-4);
+      }else if(viewCont < 5 && viewCont < (currentIndex + 5)){
+        setCurrentIndex(0);
+      }
+    }
+    
+  }, [viewCont])
 
   useEffect(() => {
     setDate();
@@ -56,18 +66,18 @@ const PlanNav = () => {
       <div className={Styles.nextBtn} onClick={navNextFnc}>▶</div>
       <div className={Styles.navDiv}>
         {/* 출발지, 숙소 설정 */}
-        {(viewCont === "STEP1" || viewCont === "STEP2") && (
-          startNav.map((cont, idx) => {
-            if (cont === viewCont) {
+        {(viewCont === "STEP1" || viewCont === "STEP2" || viewCont === "STEP3") && (
+          startNav.map((step, idx) => {
+            if (step === viewCont) {
               return (
                 <div key={idx} style={{ backgroundColor: 'lightgray' }}
-                  onClick={() => planMovekFnc(cont)}>
-                  {cont}
+                  onClick={() => planMovekFnc(step)}>
+                  {step}
                 </div>
               );
             } else {
               return (
-                <div key={idx} onClick={() => planMovekFnc(cont)}>{cont}</div>
+                <div key={idx} onClick={() => planMovekFnc(step)}>{step}</div>
               );
             }
           })
