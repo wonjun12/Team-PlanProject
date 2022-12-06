@@ -1,5 +1,5 @@
 import React from "react";
-import { axiosPost } from "../Axios/backAxios";
+import  axiosPost  from "../Axios/backAxiosPost";
 import styled from "./Logout.module.scss";
 
 const LogoutDiv = () => {

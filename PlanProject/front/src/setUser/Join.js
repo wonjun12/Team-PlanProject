@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "./Join.module.scss";
-import {axiosPost} from "../Axios/backAxios";
+import axiosPost from "../Axios/backAxiosPost";
 import JoinFailed from "../check/joinFailed";
 
 const JoinInput = ({toLogin, joinChangeBack}) => {
@@ -81,8 +81,9 @@ const JoinInput = ({toLogin, joinChangeBack}) => {
 
     const pwdFnc = (e) => {
         const { value } = e.target;
+        const pwdRegEx = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
         setPWD(value);
-        if(value.length < 8){
+        if(pwdRegEx.test(value)){
             setFailed({fail: true, index:2});
         }else if(PWDCk !== value && PWDCk !== ''){
             setFailed({fail: true, index:3});

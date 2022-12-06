@@ -2,7 +2,14 @@ const {createProxyMiddleware} = require('http-proxy-middleware');
 
 module.exports = (app) => {
     app.use(
-        ['/map-direction', '/map-direction-15', '/map-geocode'],
+        '/data',
+        createProxyMiddleware({
+            target: 'https://api.openweathermap.org',
+            changeOrigin: true
+        })
+    );
+    app.use(
+        ['/map-direction', '/map-direction-15'],
         createProxyMiddleware({
             target: 'https://naveropenapi.apigw.ntruss.com',
             changeOrigin: true

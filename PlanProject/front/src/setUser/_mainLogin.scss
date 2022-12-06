@@ -18,6 +18,7 @@
             width: 450px;
             height: 35px;
             border-radius: 5px;
+            border: none;
             &:focus{
                 background-color: #cadff7;
             }
@@ -42,6 +43,7 @@
                 background-color: rgba(255, 245, 242, 0.6);
                 width: 150px;
                 height: 35px;
+                border: none;
                 &:hover{
                     background-color: #ecffff;
                 }
@@ -53,6 +55,7 @@
 @mixin loginDiv {
     .mainLogin{
         @extend %pointDiv;
+        position: relative;
         width: 500px;
         height: 250px;
         input{
@@ -60,8 +63,20 @@
             height: 60px;
             font-size: 23px;
             border-radius: 10px;
+            border: none;
             &:focus{
                 background-color: #cadff7;
+            }
+        }
+
+        .pwdMailSend{
+            position: absolute;
+            border-color: rgba(0,0,0,0);
+            background-color: rgba(0,0,0,0);
+            top: 32%;
+            right: 3%;
+            &:hover{
+                color: #edccf7;
             }
         }
 
@@ -86,6 +101,7 @@
                 background-color: rgba(255, 245, 242, 0.6);
                 width: 100px;
                 height: 40px;
+                border: none;
                 &:hover{
                     background-color: #ecffff;
                 }

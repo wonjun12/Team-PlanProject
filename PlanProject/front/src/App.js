@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
-import { axiosPost } from "./Axios/backAxios";
+import axiosPost from "./Axios/backAxiosPost";
 import "./App.scss";
 import Rain from "./background/Rain";
 import Sun from "./background/Sun";
@@ -11,11 +11,11 @@ import SelectPage from "./select/SelectPage";
 import EmailCk from "./check/EmailCk";
 
 
-import NewPlan from "./component/NewPlan"
-import SetPlan from "./component/SetPlan"
-import ViewPlan from "./component/ViewPlan";
+import NewPlan from "./route/NewPlan";
+import ViewPlan from "./route/ViewPlan";
 
-
+import PwdChange from "./pwdChange/PwdChange";
+import OnGeoOk from "./weather/weather";
 
 function App() {
 
@@ -25,7 +25,14 @@ function App() {
 
   useEffect(() => {
     loginCkFnc();
+    getWeather();
+    
   },[])
+
+  const getWeather = async () => {
+    const getWeather = await OnGeoOk();
+    setWeather(getWeather);
+  }
 
   const loginCkFnc = async () => {
     const {result} = await axiosPost('/home/loginCk');
@@ -41,6 +48,7 @@ function App() {
     }else {
       return <Sun/>
     }
+    
   }
 
 
@@ -54,10 +62,13 @@ function App() {
             <Route path="/emailCerti" element={<EmailCk/>}></Route>
             <Route path="/select" element={<SelectPage/>}></Route>
 
-            <Route path="/newplan" element={<NewPlan/>}></Route>
-            <Route path="/newplan/:start/:end/:days/:title" element={<SetPlan/>}></Route>
+
+            <Route path="/newplan/*" element={<NewPlan />}></Route>
             
             <Route path="/viewplan" element={<ViewPlan/>}></Route>
+
+            <Route path="/password" element={<PwdChange/>}></Route>
+
           </Routes>
         </BrowserRouter>
       </div>

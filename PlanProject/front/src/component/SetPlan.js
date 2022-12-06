@@ -1,70 +1,71 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
 import Styles from "./SetPlan.module.scss";
-import { ThemeContext } from "../context/ThemeContext";
-
-import PlanNav from "./PlanNav";
+import SetDate from "./SetDate";
 import Start from "./Start";
-import Hotel from "./Hotel";
-import DayPlan from "./DayPlan";
-import LastPlan from "./LastPlan";
-import PlanView from "./PlanView";
+import Logding from "./Logding";
+import { ThemeContext } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
-// $('input').attr('autocomplete','off'); input 자동완성 끄기
+const SetPlan = () => {
 
-const ViewPlan = () => {
-  
-  // start(출발지 설정) / hotel / 숫자(일별 계획)
-  const [viewCont, setViewCont] = useState("");
-  // 여행 기본 정보
-  const {start, end, days, title} = useParams();
-  const baseData = {
-    start: start,
-    end: end,
-    days: days,
-    title: title,
-  };
+  const navigate = useNavigate();
 
-  const pageBackFnc = ()=> {
-    //경고창으로 이전으로 돌아가면 데이터가 사라진다고 알려주고
-    //DB에서 여행 계획 삭제??
-    if(viewCont === "Start" || viewCont === "Hotel"){
-      window.history.back();
-    }else if(typeof(viewCont) === "number"){
-      setViewCont("Start");
-    }else if(viewCont === "PlanView"){
-      setViewCont(0);
-    }
+  const { view, setView, dateArr } = useContext(ThemeContext);
+
+  //post 하기 전에 data 유효성 검사
+  const [dataCk, setDataCk] = useState(true);
+
+  //여행 기본 정보
+  const [baseData, setBaseData] = useState({
+    start: '',
+    end: '',
+    days: '',
+    title: '',
+  });
+
+  //출발 정보
+  const [startPlan, setStartPlan] = useState({
+    address: "",
+    time: "",
+    transportation: "car",
+    memo: "",
+  });
+
+  //숙소 정보
+  const [logding, setLogding] = useState([{
+    address: "",
+    check_in: "",
+    check_out: "",
+    reservation: false,
+    price: "",
+    memo: "",
+  }]);
+
+  const newPlanPostFnc = () => {
+    console.log("SetPlan POST");
+    const PID = 0;
+    setView(0);
+    navigate(`dayplan/${PID}/${dateArr[0]}`);
   }
 
   useEffect(() => {
-    setViewCont("Start");
-  }, []);
+    //필수 정보 유효성 검사
+    if (baseData.days !== '' && startPlan.address !== '' && logding[0].address !== '') {
+      setDataCk(false);
+    }
+  }, [baseData, startPlan, logding])
 
-  return(
-    <ThemeContext.Provider value={{viewCont, setViewCont, baseData}}>
-      <div className={Styles.container}>
-        <PlanNav/>
-        <div className={Styles.titleDiv}>
-          <div className={Styles.backBtn} onClick={pageBackFnc}>뒤로가기</div>
-          <h1>{title}</h1>
-        </div>
-        <div className={Styles.contentDiv}>
-          <div className={Styles.mapDiv}>
-          </div>
+  return (
+    <div className={Styles.setPlanWrap}>
 
-          <div className={Styles.plansDiv}>
-              {viewCont === "Start" && <Start/>}
-              {viewCont === "Hotel" && <Hotel/>}
-              {(typeof(viewCont) === "number" && viewCont < parseInt(baseData.days)-1) && <DayPlan/>}
-              {(typeof(viewCont) === "number" && viewCont === parseInt(baseData.days)-1) && <LastPlan/>}
-              {viewCont === "PlanView" && <PlanView/>}
-          </div>
+      <input type="button" value="저장" onClick={newPlanPostFnc} disabled={dataCk} />
 
-        </div>
-      </div>
-    </ThemeContext.Provider>
+      {(view === "STEP1") && <SetDate baseData={baseData} setBaseData={setBaseData} />}
+      {(view === "STEP2") && <Start startPlan={startPlan} setStartPlan={setStartPlan}/>}
+      {(view === "STEP3") && <Logding logding={logding} setLogding={setLogding} />}
+
+    </div>
   );
 }
 
-export default ViewPlan;
+export default SetPlan;

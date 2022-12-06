@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { axiosPost } from "../Axios/backAxios";
+import axiosPost from "../Axios/backAxiosPost";
 import LoginCheck from "./loginCheck";
 import styled from "./EmailCk.module.scss";
 

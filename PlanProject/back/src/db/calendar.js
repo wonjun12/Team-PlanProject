@@ -3,7 +3,7 @@ const mongoose = require('mongoose'),
 
 const CalendarSchema = new mongoose.Schema({
     _id: {
-        did: {
+        day: {
             type: Number,
             require: true
         },
