@@ -4,7 +4,7 @@ import Styles from "../route/SetPlan.module.scss";
 
 const DayPlans = () => {
 
-  const { viewCont, setViewCont, baseData } = useContext(ThemeContext);
+  const { view, setView, dateArr } = useContext(ThemeContext);
   const [open, setOpen] = useState(0);
   const [detailCk, setDetailCk] = useState(false);
   const hourRef = useRef();
@@ -78,19 +78,18 @@ const DayPlans = () => {
 
   const dayPlanPostFnc = () => {
     //dayPlan post
-    console.log(dayPlan);  
     dayPlanReset();
     setOpen(0);
-    if (viewCont >= baseData.days - 1) {
-      setViewCont("PlanView");
+    if (view >= dateArr.length) {
+      setView("PlanView");
     } else {
-      setViewCont(viewCont + 1);
+      setView(view + 1);
     }
   }
 
   useEffect(() => {
     //dayPlan get
-  }, [viewCont])
+  }, [view])
 
   return (
     <div className={Styles.planWrap}>

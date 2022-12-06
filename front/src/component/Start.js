@@ -1,11 +1,13 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import Styles from "../route/SetPlan.module.scss";
-//import Styles from "./Start.module.scss";
 
-const Start = () => {
-  const { viewCont, setViewCont } = useContext(ThemeContext);
-  const [startPlan, setStartPlan] = useState({
+const Start = ({startPlan, setStartPlan}) => {
+
+  const { setView } = useContext(ThemeContext);
+
+  //출발 정보
+  const [start, setStart] = useState({
     address: "",
     time: "",
     transportation: "car",
@@ -13,10 +15,14 @@ const Start = () => {
   });
 
   const startPostFnc = ()=> {
-    //start post
-    console.log(startPlan);
-    setViewCont("STEP3");
+    setView("STEP3");
+    setStartPlan(start);
   }
+
+  useEffect(() => {
+    //수정할 때 get
+    setStart(startPlan);
+  },[]);
 
   return (
     <div  className={Styles.startWrap}>
@@ -24,8 +30,8 @@ const Start = () => {
       <div className={Styles.planDiv}>
         <label htmlFor="address">주소</label>
         <input type="text" id="address"
-          value={startPlan.address}
-          onChange={(e) => setStartPlan((prev) => ({
+          value={start.address}
+          onChange={(e) => setStart((prev) => ({
             ...prev,
             address: e.target.value,
           }))}
@@ -33,8 +39,8 @@ const Start = () => {
 
         <label htmlFor="departure">출발시간</label>
         <input type="time" id="departure"
-          value={startPlan.time}
-          onChange={(e) => setStartPlan((prev) => ({
+          value={start.time}
+          onChange={(e) => setStart((prev) => ({
             ...prev,
             time: e.target.value,
           }))}
@@ -42,7 +48,7 @@ const Start = () => {
 
         <label htmlFor="transportation">이동수단</label>
         <select id="transportation" 
-          onChange={(e) => setStartPlan((prev) => ({
+          onChange={(e) => setStart((prev) => ({
             ...prev,
             transportation: e.target.value,
           }))}>
@@ -53,8 +59,8 @@ const Start = () => {
 
         <label htmlFor="memo">메모</label>
         <textarea id="memo" rows="12"
-          value={startPlan.memo}
-          onChange={(e) => setStartPlan((prev) => ({
+          value={start.memo}
+          onChange={(e) => setStart((prev) => ({
             ...prev,
             memo: e.target.value,
           }))}

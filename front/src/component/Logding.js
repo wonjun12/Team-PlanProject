@@ -1,13 +1,13 @@
-import React, { useContext, useState } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React, { useContext, useEffect, useState } from "react";
 import Styles from "../route/SetPlan.module.scss";
-//import Styles from "./Logding.module.scss";
 
-const Hotel = () => {
+const Logding = ({logding, setLogding}) => {
 
-  const { viewCont, setViewCont } = useContext(ThemeContext);
+  //숙소 open index
   const [open, setOpen] = useState(0);
-  const [logding, setLogding] = useState([{
+
+  //숙소 정보
+  const [log, setLog] = useState([{
     address: "",
     check_in: "",
     check_out: "",
@@ -18,17 +18,17 @@ const Hotel = () => {
 
   const valueChangeFnc = (e, key, idx, obj) => {
     const changeValue = (key === "reservation") ? e.target.checked : e.target.value;
-    let copy = [...logding];
+    let copy = [...log];
     copy[idx] = {
       ...copy[idx],
       [key]: changeValue,
     }
-    setLogding(copy);
+    setLog(copy);
   }
 
   const hotelAddFnc = () => {
-    setLogding([
-      ...logding,
+    setLog([
+      ...log,
       {
         address: "",
         check_in: "",
@@ -38,26 +38,29 @@ const Hotel = () => {
         memo: "",
       }
     ]);
-    setOpen(logding.length);
+    setOpen(log.length);
   }
 
-  //
   const deleteFnc = (delIdx) => {
     if (delIdx > 0) {
-      setLogding(logding.filter((_,idx) => idx !== delIdx));
+      setLog(log.filter((_,idx) => idx !== delIdx));
       setOpen(delIdx - 1);
     }
   }
 
   const hotelPostFnc = () => {
-    //hotel post
-    console.log(logding);
-    setViewCont(0);
+
+    setLogding(log);
   }
+
+  useEffect(() => {
+    //수정할 때 get
+    setLog(logding);
+  }, []);
 
   return (
     <div className={Styles.logdingWrap}>
-      {logding.map((obj, idx) => {
+      {log.map((obj, idx) => {
         return (
           <div className={Styles.logdingDiv} key={idx}>
             <div className={Styles.openDiv}>
@@ -121,4 +124,4 @@ const Hotel = () => {
   );
 }
 
-export default Hotel;
+export default Logding;

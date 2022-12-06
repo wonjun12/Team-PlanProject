@@ -10,9 +10,12 @@ import LogoutDiv from "./setUser/Logout";
 import SelectPage from "./select/SelectPage";
 import EmailCk from "./check/EmailCk";
 
-import SetPlan from "./route/SetPlan"
 import ViewPlan from "./route/ViewPlan";
+import axios from "axios";
 
+
+
+import NewPlan from "./route/NewPlan";
 
 
 function App() {
@@ -32,9 +35,9 @@ function App() {
   }
 
   const backgroundFnc = () => {
-    if (weather === 'rain') {
+    if (weather === 'Rain') {
       return <Rain />
-    } else if (weather === 'snow') {
+    } else if (weather === 'Snow') {
       return <Snow />
     } else {
       return <Sun />
@@ -50,17 +53,21 @@ function App() {
 
     //API
     const API_KEY = "29e6fdb8f4a2c1394c290696729a9c86";
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+    const url = `/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
 
-    fetch(url)                            
-    .then(response => response.json()) 
-    .then((data) => {
-      //console.log(data);
-      //console.log(data.name);//지역
-      //console.log(data.weather[0].main);//날씨
-      // 날씨 종류 : Rain, Snow, Clouds, Clear 등등 https://openweathermap.org/weather-conditions
-      //console.log(data.main.temp);//온도
-    });
+    const res = await axios.get(url);
+    //console.log(res.data);
+    setWeather(res.data.weather[0].main);
+
+    // fetch(url)                            
+    // .then(response => response.json()) 
+    // .then((data) => {
+    //   console.log(data);
+    //   console.log(data.name);//지역
+    //   console.log(data.weather[0].main);//날씨
+    //   // 날씨 종류 : Rain, Snow, Clouds, Clear 등등 https://openweathermap.org/weather-conditions
+    //   console.log(data.main.temp);//온도
+    // });
   }
 
   //현재 위치 정보 거부
@@ -84,8 +91,10 @@ function App() {
             <Route path="/emailCerti" element={<EmailCk />}></Route>
             <Route path="/select" element={<SelectPage />}></Route>
 
-            <Route path="/newplan" element={<SetPlan />}></Route>
-            {/* <Route path="/newplan/:start/:end/:days/:title" element={<SetPlan />}></Route> */}
+            {/* <Route path="/newplan/*" element={<SetPlan />}></Route> */}
+
+            {/* 수정중 */}
+            <Route path="/newplan/*" element={<NewPlan />}></Route>
 
             <Route path="/viewplan" element={<ViewPlan />}></Route>
           </Routes>
