@@ -7,27 +7,36 @@
   }
   .dayPlanDiv{
     overflow-y: auto;
+    label{
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input, textarea{
+      font-size: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      width: 100%;
+    }
+    input[type='checkbox'], input[type='radio']{
+      width: 20px;
+      height: 20px;
+      margin: 0;
+    }
     .btn{
       margin: 10px 0 10px 10px;
       width: 100px;
     }
+    .lastLocDiv{
+      border-bottom: 1px solid white;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      input[type='text']{
+        width: 98%;
+      }
+    }
     .planDiv{
-      label{
-        font-size: 15px;
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
-      input, textarea{
-        font-size: 15px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-        width: 100%;
-      }
-      input[type='checkbox'], input[type='radio']{
-        width: 20px;
-        height: 20px;
-        margin: 0;
-      }
       .openDiv{
         height: 22px;
         display: flex;
@@ -51,7 +60,6 @@
           right: 0;
         }
       }
-      border-top: 1px solid white;
       border-bottom: 1px solid white;
       display: flex;
       flex-direction: column;
@@ -64,6 +72,23 @@
           margin-right: 90px;
         }
       }
+
+      .addDiv{
+        label{
+          width: 100%;
+        }
+        .addInputDiv{
+          display: flex;
+          justify-content: space-between;
+          input[type='text']{
+            width: 80%;
+          }
+          input[type='button']{
+            width: 15%;
+          }
+        }
+      }
+
       .locationDiv{
         display: flex;
         justify-content: space-between;

@@ -53,8 +53,20 @@
           right: 0;
         }
       }
+
+      .addDiv{
+        display: flex;
+        justify-content: space-between;
+        input[type='text']{
+          width: 390px;
+        }
+        input[type='button']{
+          width: 70px;
+          height: 30px;
+          margin-top: 18px;
+        }
+      }
   
-      border-top: 1px solid white;
       border-bottom: 1px solid white;
       display: flex;
       flex-direction: column;

@@ -3,6 +3,7 @@ import axios from "axios";
 import { ThemeContext } from "../context/ThemeContext";
 import Styles from "./DayPlan.module.scss";
 import { useParams } from "react-router-dom";
+import { SetMap, SearchMap } from '../naver/NaverApi';
 
 const DayPlans = () => {
 
@@ -12,6 +13,10 @@ const DayPlans = () => {
   const [detailCk, setDetailCk] = useState(false);
   const hourRef = useRef();
   const minuteRef = useRef();
+  const [lastLoc, setLastLoc] = useState({
+    lastLocation: "",
+    lastAddress: ""
+  });
   const [dayPlan, setDayPlan] = useState([
     {
       order: false,
@@ -82,7 +87,7 @@ const DayPlans = () => {
   const dayPlanPostFnc = async () => {
     //dayPlan post
     const res = await axios.post(`${PLAN_URL}/${id}/planDays`, {
-      day,
+      day: view,
       dayPlan,
       point: [],
       distance: [],
@@ -102,17 +107,45 @@ const DayPlans = () => {
   //일자별 계획 GET
   const getDayPlan = async () => {
 
-    console.log(dateArr[view]);
+    //console.log(dateArr[view]);
     const res = await axios.get(`${PLAN_URL}/${id}/planDays`, {
-      params: { day: dateArr[view] },
+      params: { day: view },
     });
+
+    const { details } = res.data.dayPlan[0];
 
     if (res.data.dayPlan.length !== 0) {
       //이미 작성한 계획이 있으면 state에 담기
       console.log(res.data.dayPlan);
+      let planArr = [];
+      details.map((obj) => {
+        planArr.push({
+          order: obj.order,
+          address: obj.addr,
+          location: obj.location,
+          reservation: obj.reser,
+          price: obj.price,
+          time: obj.time,
+          memo: obj.memo,
+        });
+      });
+      setDayPlan()
     } else {
       //처음 작성하는 계획이면 초기화
       dayPlanReset();
+    }
+  }
+
+  const searchAddFnc = async (idx) => {
+
+    const searchCK = await SearchMap(dayPlan[idx].address, true);
+    if (!searchCK) {
+      let copy = [...dayPlan];
+      copy[idx] = {
+        ...copy[idx],
+        address: "",
+      }
+      setDayPlan(copy);
     }
   }
 
@@ -121,11 +154,31 @@ const DayPlans = () => {
     getDayPlan();
   }, [view])
 
+  console.log(dayPlan);
   return (
     <div className={Styles.dayPlanWrap}>
       <div className={Styles.mapDiv}>
+        <SetMap />
       </div>
       <div className={Styles.dayPlanDiv}>
+        {(view === dateArr.length - 1) && (
+          <div className={Styles.lastLocDiv}>
+            <label>최종 도착지 이름<br />
+              <input type="text" value={lastLoc.lastLocation}
+                onChange={(e) => {
+                  setLastLoc({ ...lastLoc, lastLocation: e.target.value })
+                }}
+              />
+            </label>
+            <label>최종 도착지 주소<br />
+              <input type="text" value={lastLoc.lastAddress}
+                onChange={(e) => {
+                  setLastLoc({ ...lastLoc, lastAddress: e.target.value })
+                }}
+              />
+            </label>
+          </div>
+        )}
         {dayPlan.map((obj, idx) => {
           let hour = Math.floor(obj.time / 60);
           let minute = Math.floor(obj.time % 60);
@@ -153,11 +206,15 @@ const DayPlans = () => {
                     </label>
                   </div>
 
-                  <label>주소<br />
-                    <input type="text" value={obj.address}
-                      onChange={(e) => inputChangeFnc(e, "address", idx)}
-                    />
-                  </label>
+                  <div className={Styles.addDiv}>
+                    <label htmlFor="address">주소</label>
+                    <div className={Styles.addInputDiv}>
+                      <input id="address" type="text" value={obj.address}
+                        onChange={(e) => inputChangeFnc(e, "address", idx)}
+                      />
+                      <input type="button" value="검색" onClick={() => searchAddFnc(idx)} />
+                    </div>
+                  </div>
 
                   <div className={Styles.locationDiv}>
 

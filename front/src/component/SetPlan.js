@@ -45,12 +45,11 @@ const SetPlan = () => {
   const newPlanPostFnc = async () => {
     
     //출발지 및 숙소 Post
-    const res = await axios.post(`${PLAN_URL}/plan`,{
+    const res = await axios.post(`${PLAN_URL}`,{
       SetPlan: baseData,
       Start: startPlan,
       Logding: logding,
     });
-
     setPid(res.data.PID);
     setView(0);
     navigate(`dayplan/${res.data.PID}/${dateArr[0]}`);
@@ -71,7 +70,7 @@ const SetPlan = () => {
       {(view === "STEP3") && (
         <>
           <Logding logding={logding} setLogding={setLogding} />
-          <input className={Styles.postBtn} type="button" value="저장" onClick={newPlanPostFnc} disabled={dataCk} />
+          <input className={Styles.postBtn} type="button" value="다음" onClick={newPlanPostFnc} disabled={dataCk} />
         </>
       )}
 

@@ -31,9 +31,15 @@
       margin-bottom: 10px;
       border-radius: 5px;
     }
-
-    button {
-      font-size: 15px;
+    .addDiv{
+      display: flex;
+      justify-content: space-between;
+      input[type='text']{
+        width: 70%;
+      }
+      input[type='button']{
+        width: 70px;
+      }
     }
   }
 }

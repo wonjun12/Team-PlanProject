@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Styles from "./Logding.module.scss";
+import { SetMap, SearchMap } from '../naver/NaverApi';
 
 const Logding = ({ logding, setLogding }) => {
 
@@ -53,14 +54,32 @@ const Logding = ({ logding, setLogding }) => {
     setLogding(log);
   }
 
+  const searchAddFnc = async (idx) => {
+
+    const searchCK = await SearchMap(log[idx].address, true);
+    if (!searchCK) {
+      let copy = [...log];
+      copy[idx] = {
+        ...copy[idx],
+        address: "",
+      }
+      setLog(copy);
+    }
+  }
+
   useEffect(() => {
     //수정할 때 get
+    // logding.map((obj, idx) => {
+    // });
     setLog(logding);
   }, []);
+
+  console.log(log);
 
   return (
     <div className={Styles.logdingWrap}>
       <div className={Styles.mapDiv}>
+        <SetMap />
       </div>
       <div className={Styles.logdingsDiv}>
         {log.map((obj, idx) => {
@@ -74,12 +93,14 @@ const Logding = ({ logding, setLogding }) => {
               </div>
               {(open === idx) &&
                 <>
-                  <label>
-                    주소<br />
-                    <input type="text" value={obj.address}
-                      onChange={(e) => valueChangeFnc(e, "address", idx, obj)}
-                    />
-                  </label>
+                  <div className={Styles.addDiv}>
+                    <label>
+                      주소<br />
+                      <input type="text" value={obj.address} 
+                        onChange={(e) => valueChangeFnc(e, "address", idx, obj)}/>
+                    </label>
+                    <input type="button" value="검색" onClick={() => searchAddFnc(idx)} />
+                  </div>
 
                   <label>
                     숙박일정

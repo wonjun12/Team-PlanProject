@@ -4,8 +4,7 @@ const mongoose = require('mongoose'),
 const CalendarSchema = new mongoose.Schema({
     _id: {
         day: {
-            //소진 수정
-            type: Date,
+            type: Number,
             require: true
         },
         plan: {
