@@ -11,7 +11,8 @@ const SetPlan = () => {
 
   const navigate = useNavigate();
 
-  const { view, setView, dateArr, setPid, PLAN_URL } = useContext(ThemeContext);
+  const { view, setView, dateArr, setPid, PLAN_URL, startPlan, logding}
+   = useContext(ThemeContext);
 
   //post 하기 전에 data 유효성 검사
   const [dataCk, setDataCk] = useState(true);
@@ -24,26 +25,28 @@ const SetPlan = () => {
     title: '',
   });
 
-  //출발 정보
-  const [startPlan, setStartPlan] = useState({
-    address: "",
-    time: "",
-    transportation: "car",
-    memo: "",
-  });
+  // //출발 정보
+  // const [startPlan, setStartPlan] = useState({
+  //   address: "",
+  //   time: "",
+  //   transportation: "car",
+  //   memo: "",
+  // });
 
-  //숙소 정보
-  const [logding, setLogding] = useState([{
-    address: "",
-    check_in: "",
-    check_out: "",
-    reservation: false,
-    price: "",
-    memo: "",
-  }]);
+  // //숙소 정보
+  // const [logding, setLogding] = useState([{
+  //   address: "",
+  //   check_in: "",
+  //   check_out: "",
+  //   reservation: false,
+  //   price: "",
+  //   memo: "",
+  // }]);
 
   const newPlanPostFnc = async () => {
-    
+    console.log('base',baseData);
+    console.log('start',startPlan);
+    console.log('log',logding);
     //출발지 및 숙소 Post
     const res = await axios.post(`${PLAN_URL}`,{
       SetPlan: baseData,
@@ -66,10 +69,10 @@ const SetPlan = () => {
     <div className={Styles.setPlanWrap}>
 
       {(view === "STEP1") && <SetDate baseData={baseData} setBaseData={setBaseData} />}
-      {(view === "STEP2") && <Start startPlan={startPlan} setStartPlan={setStartPlan}/>}
+      {(view === "STEP2") && <Start />}
       {(view === "STEP3") && (
         <>
-          <Logding logding={logding} setLogding={setLogding} />
+          <Logding />
           <input className={Styles.postBtn} type="button" value="다음" onClick={newPlanPostFnc} disabled={dataCk} />
         </>
       )}

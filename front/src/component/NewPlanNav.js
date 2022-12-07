@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 import Styles from "../route/NewPlan.module.scss";
 
@@ -48,11 +48,15 @@ const NewPlanNav = () => {
     }
   }, [view]);
 
-  //현재 일정날짜에 따라 nav 위치 변경
-  // useEffect(() => {
-  //   
 
-  // }, [viewCont])
+  // //새로고침 됐을때 view 초기화 방지
+  // const { pathname } = useLocation();
+  // useEffect(() => {
+  //   const path = pathname.split('/');
+  //   if(`${path[1]}/${path[2]}` === 'newplan/dayplan'){
+  //     setView(0);
+  //   }
+  // }, [])
 
   return (
     <div className={Styles.navWrap}>

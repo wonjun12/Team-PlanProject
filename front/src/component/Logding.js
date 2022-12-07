@@ -1,8 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Styles from "./Logding.module.scss";
 import { SetMap, SearchMap } from '../naver/NaverApi';
+import { ThemeContext } from "../context/ThemeContext";
 
-const Logding = ({ logding, setLogding }) => {
+const Logding = () => {
+
+  const { logding, setLogding } = useContext(ThemeContext);
 
   //숙소 open index
   const [open, setOpen] = useState(0);
@@ -64,6 +67,7 @@ const Logding = ({ logding, setLogding }) => {
         address: "",
       }
       setLog(copy);
+      alert('주소를 다시 검색해주세요');
     }
   }
 

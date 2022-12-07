@@ -17,6 +17,8 @@ const SetDate = ({baseData, setBaseData}) => {
     title: '',
   });
 
+  const [calDate, SetCalDate] = useState([new Date(),new Date()]);
+
   //날짜 유효성 CK
   const [dateCK, setDateCK] = useState(true);
 
@@ -41,6 +43,7 @@ const SetDate = ({baseData, setBaseData}) => {
 
   //onChange 함수
   const changeDate = (ranges) => {
+    SetCalDate(ranges);
     const days = getDays(ranges[0],ranges[1]);
     setBase({
       ...base,
@@ -80,7 +83,11 @@ const SetDate = ({baseData, setBaseData}) => {
 
   useEffect(() => {
     //수정할 때 get
-    setBase(baseData);
+    if(baseData.start !== "" && baseData.end !== ""){
+      setBase(baseData);
+      SetCalDate([new Date(baseData.start), new Date(baseData.end)]);
+      setDateCK(false);
+    }
   }, []);
 
   return (
@@ -88,6 +95,7 @@ const SetDate = ({baseData, setBaseData}) => {
       <Calendar
         onChange={changeDate}
         selectRange={true}
+        value={calDate}
       />
       <div className={Styles.setDateDiv}>
         <p className={Styles.hello}>HELLO USER</p>

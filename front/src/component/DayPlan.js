@@ -13,10 +13,6 @@ const DayPlans = () => {
   const [detailCk, setDetailCk] = useState(false);
   const hourRef = useRef();
   const minuteRef = useRef();
-  const [lastLoc, setLastLoc] = useState({
-    lastLocation: "",
-    lastAddress: ""
-  });
   const [dayPlan, setDayPlan] = useState([
     {
       order: false,
@@ -26,6 +22,8 @@ const DayPlans = () => {
       price: "",
       time: 0,
       memo: "",
+      lastLocation: "",
+      lastAddress: ""
     },
   ]);
 
@@ -97,7 +95,7 @@ const DayPlans = () => {
     if (res.data.result) {
       setOpen(0);
       if (view >= dateArr.length - 1) {
-        setView("PlanView");
+        //setView("PlanView");
       } else {
         setView(view + 1);
       }
@@ -112,11 +110,16 @@ const DayPlans = () => {
       params: { day: view },
     });
 
-    const { details } = res.data.dayPlan[0];
+    if (res.data.dayPlan.length > 0) {
+      //이미 작성한 계획이 있으면 state에 담기      
+      const { details } = res.data.dayPlan[0];
 
-    if (res.data.dayPlan.length !== 0) {
-      //이미 작성한 계획이 있으면 state에 담기
-      console.log(res.data.dayPlan);
+      console.log('backGet',res.data.dayPlan);
+
+      if(view === dateArr.length-1){
+
+      }
+
       let planArr = [];
       details.map((obj) => {
         planArr.push({
@@ -129,7 +132,7 @@ const DayPlans = () => {
           memo: obj.memo,
         });
       });
-      setDayPlan()
+      setDayPlan(planArr);
     } else {
       //처음 작성하는 계획이면 초기화
       dayPlanReset();
@@ -154,7 +157,6 @@ const DayPlans = () => {
     getDayPlan();
   }, [view])
 
-  console.log(dayPlan);
   return (
     <div className={Styles.dayPlanWrap}>
       <div className={Styles.mapDiv}>
@@ -164,17 +166,13 @@ const DayPlans = () => {
         {(view === dateArr.length - 1) && (
           <div className={Styles.lastLocDiv}>
             <label>최종 도착지 이름<br />
-              <input type="text" value={lastLoc.lastLocation}
-                onChange={(e) => {
-                  setLastLoc({ ...lastLoc, lastLocation: e.target.value })
-                }}
+              <input type="text" value={dayPlan.lastLocation}
+                onChange={(e) => inputChangeFnc(e, "lastLocation", 0)}
               />
             </label>
             <label>최종 도착지 주소<br />
-              <input type="text" value={lastLoc.lastAddress}
-                onChange={(e) => {
-                  setLastLoc({ ...lastLoc, lastAddress: e.target.value })
-                }}
+              <input type="text" value={dayPlan.lastAddress}
+                onChange={(e) => inputChangeFnc(e, "lastAddress", 0)}
               />
             </label>
           </div>
@@ -277,7 +275,7 @@ const DayPlans = () => {
           );
         })}
         <input className={Styles.btn} type="button" value="일정추가" onClick={dayPlanAddFnc} />
-        <input className={Styles.btn} type="button" value="완료" onClick={dayPlanPostFnc} />
+        <input className={Styles.btn} type="button" value="저장" onClick={dayPlanPostFnc} />
       </div>
     </div>
 

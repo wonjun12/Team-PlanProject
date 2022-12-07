@@ -3,9 +3,9 @@ import { ThemeContext } from "../context/ThemeContext";
 import Styles from "./Start.module.scss";
 import { SetMap, SearchMap } from '../naver/NaverApi';
 
-const Start = ({ startPlan, setStartPlan }) => {
+const Start = () => {
 
-  const { setView } = useContext(ThemeContext);
+  const { setView, startPlan, setStartPlan } = useContext(ThemeContext);
 
   //출발 정보
   const [start, setStart] = useState({
@@ -15,8 +15,6 @@ const Start = ({ startPlan, setStartPlan }) => {
     memo: "",
   });
 
-  const addRef = useRef(null);
-
   const startPostFnc = () => {
     setView("STEP3");
     setStartPlan(start);
@@ -24,24 +22,22 @@ const Start = ({ startPlan, setStartPlan }) => {
 
   const searchAddFnc = async () => {
 
-    const searchCK = await SearchMap(addRef.current.value, true);
-    if (searchCK) {
-      setStart({
-        ...start,
-        address: addRef.current.value
-      });
+    const searchCK = await SearchMap(start.address, true);
+    if (!searchCK) {
+      setStart((prev) => ({
+        ...prev,
+        address: "",
+      }))
+      alert('주소를 다시 검색해주세요');
     }
   }
 
   useEffect(() => {
     //수정할 때 get
-    if(startPlan.address !== ""){
-      addRef.current.value = startPlan.address;
-    }
     setStart(startPlan);
   }, []);
   
-  console.log(start);
+  //console.log(start);
 
   return (
     <div className={Styles.startWrap}>
@@ -54,7 +50,11 @@ const Start = ({ startPlan, setStartPlan }) => {
         <p>출발지 설정</p>
         <div className={Styles.addDiv}>
           <label htmlFor="address">주소</label>
-          <input type="text" id="address" ref={addRef} />
+          <input type="text" id="address" value={start.address}
+            onChange={(e) => setStart((prev) => ({
+              ...prev,
+              address: e.target.value,
+            }))}/>
           <input type="button" value="검색" onClick={searchAddFnc} />
         </div>
 

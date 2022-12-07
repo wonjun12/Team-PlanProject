@@ -259,6 +259,7 @@ module.exports = {
 
         calender.save();
 
+        //소진 last 출력이 안됨
         console.log(calender);
         res.json({ result: true }).end();
 

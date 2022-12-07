@@ -7,11 +7,7 @@ import NewPlanNav from "../component/NewPlanNav";
 import SetPlan from "../component/SetPlan";
 import DayPlan from "../component/DayPlan";
 
-
-
-import LastPlan from "../component/LastPlan";
 import PlanView from "../component/PlanView";
-
 
 import { ThemeContext } from "../context/ThemeContext";
 // $('input').attr('autocomplete','off'); //input 자동완성 끄기
@@ -30,11 +26,30 @@ const NewPlan = () => {
   //날짜 배열
   const [dateArr, setDateArr] = useState([]);
 
+  //출발 정보
+  const [startPlan, setStartPlan] = useState({
+    address: "",
+    time: "",
+    transportation: "car",
+    memo: "",
+  });
+
+  //숙소 정보
+  const [logding, setLogding] = useState([{
+    address: "",
+    check_in: "",
+    check_out: "",
+    reservation: false,
+    price: "",
+    memo: "",
+  }]);
+
   return (
     <div className={Styles.container}>
 
       <ThemeContext.Provider
-        value={{ view, setView, dateArr, setDateArr, pid, setPid, PLAN_URL }}>
+        value={{ view, setView, dateArr, setDateArr, pid, setPid, PLAN_URL, 
+          startPlan, setStartPlan, logding, setLogding }}>
         <NewPlanNav />
         <Routes>
           <Route path="/" element={<SetPlan />} />
