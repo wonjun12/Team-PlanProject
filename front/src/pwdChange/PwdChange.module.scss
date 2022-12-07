@@ -1,0 +1,59 @@
+.pwdChangeDiv{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 400px;
+    height: 220px;
+    border-radius: 10px;
+    border: 1px solid #e6f2ff;
+    input{
+        position: absolute;
+        width: 370px;
+        height: 35px;
+        border-radius: 5px;
+        border: 1px solid #e6f2ff;
+        font-size: 15px;
+        &:focus{
+            background-color: #cadff7;
+        }
+
+        &:nth-child(2){
+            top: 26%;
+        }
+        &:nth-child(4){
+            top: 55%;
+        }
+    }
+
+    div{
+        position: absolute;
+        &:nth-child(1){
+            top: 0%;
+            color:rgb(59, 64, 78);
+        }
+        &:nth-child(3){
+            top:44%;
+            left: 4%;
+            color: red;
+        }
+        &:nth-child(5){
+            bottom:17%;
+            left: 4%;
+            color: red;
+        }
+    }
+
+    button:nth-child(6){
+        position: absolute;
+        right: 4%;
+        bottom: 3%;
+        border-radius: 10px;
+        border: 1px solid #2b2c2e;
+        background-color: rgba(0,0,0,0);
+        &:hover{
+            color: #edccf7;
+        }
+    }
+}

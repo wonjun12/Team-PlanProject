@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
-import Styles from "../route/SetPlan.module.scss";
+import Styles from "../route/NewPlan.module.scss";
 
 const NewPlanNav = () => {
 
   const navigate = useNavigate();
 
-  const { view, setView, dateArr } = useContext(ThemeContext);
+  const { view, setView, dateArr, pid } = useContext(ThemeContext);
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -28,29 +28,34 @@ const NewPlanNav = () => {
 
   //날짜 클릭
   const planMovekFnc = (step, idx) => {
+    
     setView(idx);
-    navigate(`dayplan/0/${step}`);
   }
 
   useEffect(() => {
+
     console.log(view);
+
+    if(typeof(view) === 'number'){
+
+      if(view > 4 && view > (currentIndex + 4)) {
+        setCurrentIndex(view-4);
+      }else if(view < 5 && view < (currentIndex + 5)){
+        setCurrentIndex(0);
+      }
+      
+      navigate(`dayplan/${pid}/${dateArr[view]}`);
+    }
   }, [view]);
 
   //현재 일정날짜에 따라 nav 위치 변경
   // useEffect(() => {
-  //   if(typeof(viewCont) === 'number'){
-
-  //     if(viewCont > 4 && viewCont > (currentIndex + 4)) {
-  //       setCurrentIndex(viewCont-4);
-  //     }else if(viewCont < 5 && viewCont < (currentIndex + 5)){
-  //       setCurrentIndex(0);
-  //     }
-  //   }
+  //   
 
   // }, [viewCont])
 
   return (
-    <>
+    <div className={Styles.navWrap}>
       <div className={Styles.prevBtn} onClick={navPrevFnc}>◀</div>
       <div className={Styles.nextBtn} onClick={navNextFnc}>▶</div>
       <div className={Styles.navDiv}>
@@ -58,7 +63,7 @@ const NewPlanNav = () => {
           startNav.map((step, idx) => {
             if (step === view) {
               return (
-                <div key={idx} style={{ backgroundColor: 'lightgray' }}
+                <div key={idx} style={{ backgroundColor: 'rgba(183, 182, 182, 0.5)' }}
                   onClick={() => setView(step)}>
                   {step}
                 </div>
@@ -77,7 +82,7 @@ const NewPlanNav = () => {
                   className={Styles.dayNavDiv}
                   style={{
                     transform: `translate(-${currentIndex * 100}%)`,
-                    backgroundColor: 'lightgray',
+                    backgroundColor: 'rgba(183, 182, 182, 0.5)',
                   }}>
                   {date}
                 </div>
@@ -103,7 +108,7 @@ const NewPlanNav = () => {
           </>
         )}  */}
       </div>
-    </>
+    </div>
   );
 }
 export default NewPlanNav;

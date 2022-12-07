@@ -1,20 +1,28 @@
 import axios from "axios";
+import {useNavigate} from 'react-router-dom'
 axios.defaults.withCredentials = true;
 
-const hrefChange = (href, time) => {
+
+const HrefChange = (href, time) => {
+
+    const navigate = useNavigate();
+
     if(href !== undefined){
         if(time !== undefined){
             setTimeout(() => {
-                window.location.href = href;
+                navigate(href);
             }, time)
         }else{
-            window.location.href = href;
+            navigate(href);
         }
     }
 }
 
 
-export const axiosPost = async (url, body, href, time) => {
+const axiosPost = async (url, body, href, time) => {
+
+        
+    
         const {data} = await axios.post(`/back${url}`, body);
         const {result, error, email} = data;
 
@@ -24,19 +32,11 @@ export const axiosPost = async (url, body, href, time) => {
             }else if(url === '/home/login'){
                 window.sessionStorage.setItem('loginCk', result);
             }
-            hrefChange(href, time);
+            await HrefChange(href, time);
             return {result};
         }else {
             return {result, error};
         }
 };
 
-
-export const axiosGet = async (url, params) => {
-    try {
-        const res = await axios.get(`/back${url}`, params);
-
-    } catch {
-        
-    }
-};
+export default axiosPost;

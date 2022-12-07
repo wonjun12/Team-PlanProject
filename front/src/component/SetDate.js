@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Calendar } from "react-calendar";
-import Styles from "../route/SetPlan.module.scss";
+import Styles from "./SetDate.module.scss";
 import './Calendar.css';
 
 import { ThemeContext } from "../context/ThemeContext";
@@ -26,8 +26,11 @@ const SetDate = ({baseData, setBaseData}) => {
     const mm = date.getMonth() + 1;
     const dd = date.getDate();
     const day = date.getDay();
-    const dayStr = ["일","월","화","수","목","금","토"];
-    return `${yyyy}-${mm}-${dd}-${dayStr[day]}`;
+
+    return `${yyyy}-${mm}-${dd}`;
+
+    // const dayStr = ["일","월","화","수","목","금","토"];
+    // return `${yyyy}-${mm}-${dd}-${dayStr[day]}`;
   }
 
   // 
@@ -51,10 +54,11 @@ const SetDate = ({baseData, setBaseData}) => {
   //날짜 설정
   const setDate = () => {
     let arr = [];
-    let date = new Date(base.start.substring(0, base.start.length - 2));
+    let date = new Date(base.start);
     for (let i = 1; i <= parseInt(base.days); i++) {
+      const dateStr = getDate(date);
       arr.push(
-        `${date.getMonth() + 1}월${date.getDate()}일`
+        dateStr
       );
       date.setDate(date.getDate() + 1);
     }
@@ -80,22 +84,24 @@ const SetDate = ({baseData, setBaseData}) => {
   }, []);
 
   return (
-    <div className={Styles.container}>
-      <label>여행 제목
-        <input type="text" value={base.title} 
-          onChange={(e) => setBase({...base, title: e.target.value})} />
-      </label>
+    <div className={Styles.setDateWrap}>
       <Calendar
         onChange={changeDate}
         selectRange={true}
       />
-      <div className={Styles.deteDiv}>
-        <p>Start : {base.start}</p>
-        <p>End : {base.end}</p>
-        {(base.days !== 0 && base.days !== "") && 
-          <p>{base.days - 1}박 {base.days}일</p>}
+      <div className={Styles.setDateDiv}>
+        <p className={Styles.hello}>HELLO USER</p>
+        <label htmlFor="title">여행 제목</label>
+        <input id="title" type="text" value={base.title} 
+          onChange={(e) => setBase({...base, title: e.target.value})} />
+        <div className={Styles.textDiv}>
+          <p>START : {base.start}</p>
+          <p>END : {base.end}</p>
+          {(base.days !== 0 && base.days !== "") && 
+            <p>{base.days - 1}박 {base.days}일</p>}
 
-        <input type="button" value="다음" disabled={dateCK} onClick={setDatePostFnc}/>
+          <input type="button" value="다음" disabled={dateCK} onClick={setDatePostFnc}/>
+        </div>
       </div>
     </div>
   );

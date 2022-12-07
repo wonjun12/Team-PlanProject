@@ -1,8 +1,9 @@
 .react-calendar {
-  width: 350px;
+  width: 100%;
+  height: 500px;
   max-width: 100%;
   background-color: rgba(255, 255, 255, 0.5);
-  border: 1px solid #a0a096;
+  /* border: 1px solid #a0a096; */
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.125em;
 }
@@ -81,7 +82,7 @@
   padding: 10px 6.6667px;
   background: none;
   text-align: center;
-  line-height: 16px;
+  line-height: 30px;
 }
 .react-calendar__tile:disabled {
   background-color: #f0f0f0;

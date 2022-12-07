@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "./Login.module.scss";
 import Join from "./Join";
-import { axiosPost } from "../Axios/backAxios";
+import  axiosPost  from "../Axios/backAxiosPost";
 import LoginFailed from "../check/loginFailed";
 import LoginCheck from "../check/loginCheck";
 
@@ -15,6 +15,7 @@ const MainInput = (bool) => {
 
     const [id, setId] = useState('');
     const [pwd, setPwd] = useState('');
+    const [emailPlace, setEmailPlace] = useState('이메일');
 
     const waitTime = 2950;
 
@@ -82,6 +83,17 @@ const MainInput = (bool) => {
         }
     };
 
+    const pwdSearch = async () => {
+        const {result, error} = await axiosPost('/home/sendPwd',{email: id});
+        
+        if(!result){
+            setLoginFailed({fail: !result, error});
+        }else{
+            setId('');
+            setEmailPlace('이메일을 성공적으로 보냈습니다!!');
+        }
+    };
+
     useEffect(() => {
         LoginCheck();
     },[]);
@@ -93,7 +105,8 @@ const MainInput = (bool) => {
             <form id="loginFormId" className={formChange? styled.loginForm : styled.loginFormBack} >
                 <div className={styled.mainLogin}>
                     
-                    <input type="text" placeholder="이메일" onChange={(v) => setId(v.target.value)} value={id} />
+                    <input type="text" placeholder={emailPlace} onChange={(v) => setId(v.target.value)} value={id} />
+                        <button type="button" className={styled.pwdMailSend} onClick={pwdSearch}>비밀번호가 기억나지 않으신다면 누르세요.</button>
                     <input type="password" placeholder="비밀번호" onChange={(v) => setPwd(v.target.value)} value={pwd}/>
                     <div>
                         <button type="button" onClick={toJoin} disabled={buttonDisable}> 비회원이면 회원가입 가능! </button>

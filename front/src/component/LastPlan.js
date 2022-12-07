@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
-import Styles from "../route/SetPlan.module.scss";
+import Styles from "../route/NewPlan.module.scss";
 
 const LastPlan = () => {
 

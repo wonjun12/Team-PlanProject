@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import Styles from "./SetPlan.module.scss";
+import Styles from "./NewPlan.module.scss";
 
 import NewPlanNav from "../component/NewPlanNav";
 
@@ -18,6 +18,12 @@ import { ThemeContext } from "../context/ThemeContext";
 
 const NewPlan = () => {
 
+  //게시글 생성 되면 PID를 가져와서 Nav에서 사용
+  const [pid, setPid] = useState("");
+
+  //server_url
+  const PLAN_URL = 'http://localhost:3000/back/plan';
+
   //View Content
   const [view, setView] = useState("STEP1");
 
@@ -28,11 +34,11 @@ const NewPlan = () => {
     <div className={Styles.container}>
 
       <ThemeContext.Provider
-        value={{ view, setView, dateArr, setDateArr }}>
+        value={{ view, setView, dateArr, setDateArr, pid, setPid, PLAN_URL }}>
         <NewPlanNav />
         <Routes>
           <Route path="/" element={<SetPlan />} />
-          <Route path="/dayplan/:id/:date" element={<DayPlan />} />
+          <Route path="/dayplan/:id/:day" element={<DayPlan />} />
         </Routes>
 
       </ThemeContext.Provider>

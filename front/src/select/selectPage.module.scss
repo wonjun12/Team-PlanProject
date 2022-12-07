@@ -3,20 +3,94 @@
     @extend %pointDiv;
     animation: selectView 3s ease;
     width: 400px;
-    height: 150px;
+    height: 200px;
     div{
         width: 100%;
         height: 100%;
         display: flex;
         justify-content: space-between;
+        flex-wrap: wrap;
         button{
             background-color: rgba(0,0,0,0);
             border-color: rgba(0,0,0,0);
             width: 50%;
+            height: 75%;
             font-size: 20px;
             color: rgba(31, 30, 30, 0.89);
             &:hover{
                 background-color: rgba(154, 206, 159, 0.562);
+            }
+        }
+        button:nth-child(3){
+            width: 100%;
+            height: 25%;
+            border-top: 0.5px dotted wheat;
+        }
+        
+    }
+}
+.pwdDiv{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.514);
+    div:nth-child(1){
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 400px;
+        height: 200px;
+        border: 1px solid white;
+        border-radius: 10px;
+        input{
+            width: 90%;
+            height: 27px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            border: none;
+        }
+        p{
+            color: red;
+            position: absolute;
+            font-size: 12.5px;
+        }
+        .pwdErr{
+            top: 37%;
+        }
+        .pwdCkErr{
+            bottom: 18%;
+        }
+        div{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 20%;
+            button{
+                border: none;
+            }
+            button:nth-child(1){
+                position: absolute;
+                background-color: rgba(0,0,0,0);
+                left: 2%;
+            }
+            button:nth-child(2){
+                width: 50%;
+                height: 80%;
+                border-radius: 10px;
+                background-color: rgba(241, 209, 188, 0.877);
+            }
+            button:nth-child(3){
+                position: absolute;
+                right: 0;
+                top: 0;
+                background-color: rgba(0,0,0,0);
             }
         }
         

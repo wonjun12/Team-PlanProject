@@ -1,0 +1,119 @@
+.dayPlanWrap{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 500px;
+  .mapDiv{
+    background-color: antiquewhite;
+  }
+  .dayPlanDiv{
+    overflow-y: auto;
+    .btn{
+      margin: 10px 0 10px 10px;
+      width: 100px;
+    }
+    .planDiv{
+      label{
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input, textarea{
+        font-size: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+      }
+      input[type='checkbox'], input[type='radio']{
+        width: 20px;
+        height: 20px;
+        margin: 0;
+      }
+      .openDiv{
+        height: 22px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+        p{
+          margin: 0;
+          color: white;
+          font-size: 15px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+        }
+        .openSpan{
+          cursor: pointer;
+          color: white;
+          position: absolute;
+          font-size: 22px;
+          top: -8px;
+          right: 0;
+        }
+      }
+      border-top: 1px solid white;
+      border-bottom: 1px solid white;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      
+      .orderDiv{
+        width: 100%;
+        margin-bottom: 5px;
+        label{
+          margin-right: 90px;
+        }
+      }
+      .locationDiv{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        .timeDiv{
+          display: flex;
+          input{
+            width: 50px;
+          }
+        }
+      }
+
+      .detailBtnDiv{
+        height: 22px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+        p{
+          margin: 0;
+          color: white;
+          font-size: 15px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+        }
+        span{
+          cursor: pointer;
+          position: absolute;
+          color: white;
+          font-size: 22px;
+          top: -8px;
+          right: 0;
+        }
+      }
+
+      .detailDiv{
+        display: flex;
+        width: 100%;
+        label{
+          margin-right: 50px;
+        }
+        input[type='number']{
+          width: 200px;
+        }
+      }
+      .deleteBtn{
+        width: 100px;
+        align-self: flex-end;
+      }
+    }
+  }
+}

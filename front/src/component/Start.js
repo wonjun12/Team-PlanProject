@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
-import Styles from "../route/SetPlan.module.scss";
+import Styles from "./Start.module.scss";
 
 const Start = ({startPlan, setStartPlan}) => {
 
@@ -14,9 +14,16 @@ const Start = ({startPlan, setStartPlan}) => {
     memo: "",
   });
 
-  const startPostFnc = ()=> {
+  const startPostFnc = () => {
     setView("STEP3");
     setStartPlan(start);
+  }
+
+  const setTimeFnc = (e) => {
+    setStart({
+      ...start,
+      time: e.target.value
+    })
   }
 
   useEffect(() => {
@@ -26,8 +33,12 @@ const Start = ({startPlan, setStartPlan}) => {
 
   return (
     <div  className={Styles.startWrap}>
-      <p>출발지 설정</p>
+
+      <div className={Styles.mapDiv}>
+      </div>
+
       <div className={Styles.planDiv}>
+        <p>출발지 설정</p>
         <label htmlFor="address">주소</label>
         <input type="text" id="address"
           value={start.address}
@@ -40,10 +51,7 @@ const Start = ({startPlan, setStartPlan}) => {
         <label htmlFor="departure">출발시간</label>
         <input type="time" id="departure"
           value={start.time}
-          onChange={(e) => setStart((prev) => ({
-            ...prev,
-            time: e.target.value,
-          }))}
+          onChange={(e) => setTimeFnc(e)}
         />
 
         <label htmlFor="transportation">이동수단</label>
@@ -58,7 +66,7 @@ const Start = ({startPlan, setStartPlan}) => {
         </select>
 
         <label htmlFor="memo">메모</label>
-        <textarea id="memo" rows="12"
+        <textarea id="memo" rows="8"
           value={start.memo}
           onChange={(e) => setStart((prev) => ({
             ...prev,
@@ -66,7 +74,7 @@ const Start = ({startPlan, setStartPlan}) => {
           }))}
         ></textarea>
 
-        <button onClick={startPostFnc}>숙소설정</button>
+        <input type="button" value="다음" onClick={startPostFnc}/>
       </div>
     </div>
   );

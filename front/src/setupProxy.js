@@ -9,7 +9,7 @@ module.exports = (app) => {
         })
     );
     app.use(
-        ['/map-direction', '/map-direction-15', '/map-geocode'],
+        ['/map-direction', '/map-direction-15'],
         createProxyMiddleware({
             target: 'https://naveropenapi.apigw.ntruss.com',
             changeOrigin: true

@@ -2,11 +2,15 @@ const mongoose = require('mongoose'),
     {Types} = mongoose;
 
     const DetailsSchema = new mongoose.Schema({
+        _plan : {
+            type: Types.ObjectId,
+            ref: 'Plan'
+        },
         addr: {
             type: String,
             require: true
         },
-        name: {
+        location: {
             type: String,
             require: true
         },
@@ -15,15 +19,14 @@ const mongoose = require('mongoose'),
         time: Number,
         trans: String,
         memo: String,
-        orders: {
-            arr: {
-                type: Boolean,
-                require: true
-            },
-            order: {
-                type: Number,
-                require: true
-            }
+        count: Number,
+        order: {
+            type: Boolean,
+            require: true
+        },
+        last : {
+            addr : String,
+            location : String
         }
     })
 
