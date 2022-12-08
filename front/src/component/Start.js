@@ -5,24 +5,32 @@ import { SetMap, SearchMap } from '../naver/NaverApi';
 
 const Start = () => {
 
-  const { setView, startPlan, setStartPlan } = useContext(PlanContext);
+  const { navState, setNavState, plan, setPlan } = useContext(PlanContext);
 
   //출발 정보
   const [start, setStart] = useState({
+    id: '',
     address: "",
     time: "",
     transportation: "car",
     memo: "",
   });
 
+  //저장
   const startPostFnc = () => {
     console.log('start', start);
-    setView("STEP3");
-    setStartPlan(start);
+    setNavState({
+      ...navState,
+      view: 'STEP3'
+    });
+    setPlan({
+      ...plan,
+      startPlan: start
+    });
   }
 
+  //지도 검색
   const searchAddFnc = async () => {
-
     const searchCK = await SearchMap(start.address, true);
     if (!searchCK) {
       setStart((prev) => ({
@@ -35,11 +43,9 @@ const Start = () => {
 
   useEffect(() => {
     //수정할 때 get
-    setStart(startPlan);
+    setStart(plan.startPlan);
   }, []);
   
-  //console.log(start);
-
   return (
     <div className={Styles.startWrap}>
 

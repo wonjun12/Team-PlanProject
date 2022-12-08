@@ -7,7 +7,7 @@ const NewPlanNav = () => {
 
   const navigate = useNavigate();
 
-  const { view, setView, dateArr, pid } = useContext(PlanContext);
+  const { navState, setNavState, plan } = useContext(PlanContext);
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -21,45 +21,36 @@ const NewPlanNav = () => {
     }
   }
   const navNextFnc = () => {
-    if (currentIndex < dateArr.length - 5) {
+    if (currentIndex < navState.dateArr.length - 5) {
       setCurrentIndex(currentIndex + 1);
     }
   }
 
   //날짜 클릭
-  const planMovekFnc = (step, idx) => {
-    navigate(`/`);
-    setView(idx);
+  const planMovekFnc = (idx) => {
+    setNavState({
+      ...navState,
+      view: idx,
+    });
+    navigate(`dayplan/${plan.PID}/${navState.dateArr[navState.view]}`);
   }
 
   useEffect(() => {
 
-    console.log("view : ",view);
+    console.log("nav : ",navState);
 
-    if(typeof(view) === 'number'){
-
-      if(view > 4 && view > (currentIndex + 4)) {
-        setCurrentIndex(view-4);
-      }else if(view < 5 && view < (currentIndex + 5)){
+    if(typeof(navState.view) === 'number'){
+      if(navState.view > 4 && navState.view > (currentIndex + 4)) {
+        setCurrentIndex(navState.view-4);
+      }else if(navState.view < 5 && navState.view < (currentIndex + 5)){
         setCurrentIndex(0);
       }
-      navigate(`dayplan/${pid}/${dateArr[view]}`);
     }
-  }, [view]);
-
-
-  // //새로고침 됐을때 view 초기화 방지
-  // const { pathname } = useLocation();
-  // useEffect(() => {
-  //   const path = pathname.split('/');
-  //   if(`${path[1]}/${path[2]}` === 'newplan/dayplan'){
-  //     setView(0);
-  //   }
-  // }, [])
+  }, [navState.view]);
 
   return (
     <div className={Styles.navWrap}>
-      {(typeof(step) === 'number') && 
+      {(typeof(navState.view) === 'number') && 
         <>
           <div className={Styles.prevBtn} onClick={navPrevFnc}>◀</div>
           <div className={Styles.nextBtn} onClick={navNextFnc}>▶</div>
@@ -67,24 +58,26 @@ const NewPlanNav = () => {
       }
       
       <div className={Styles.navDiv}>
-        {(view === 'STEP1' || view === 'STEP2' || view === 'STEP3') ? (
+        {(navState.view === 'STEP1' || navState.view === 'STEP2' || navState.view === 'STEP3') ? (
           startNav.map((step, idx) => {
-            if (step === view) {
+            if (step === navState.view) {
               return (
                 <div key={idx} style={{ backgroundColor: 'rgba(183, 182, 182, 0.5)' }}
-                  onClick={() => setView(step)}>
+                  onClick={() => setNavState({...navState, view:step})}>
                   {step}
                 </div>
               );
             } else {
               return (
-                <div key={idx} onClick={() => setView(step)}>{step}</div>
+                <div key={idx} onClick={() => setNavState({...navState, view:step})}>
+                  {step}
+                </div>
               );
             }
           })
         ) : (
-          dateArr.map((date, idx) => {
-            if (view === idx) {
+          navState.dateArr.map((date, idx) => {
+            if (navState.view === idx) {
               return (
                 <div onClick={() => planMovekFnc(date, idx)} key={idx}
                   className={Styles.dayNavDiv}
@@ -108,13 +101,6 @@ const NewPlanNav = () => {
             }
           })
         )}
-        {/* 미리보기에서 최종완료 or 수정 선택*/}
-        {/* {(viewCont === "PlanView") && (
-          <>
-            <div onClick={() => setViewCont(0)}>계획수정</div>
-            <div onClick={() => setViewCont("Complete")}>최종완료</div>
-          </>
-        )}  */}
       </div>
     </div>
   );

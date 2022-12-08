@@ -179,7 +179,7 @@ module.exports = {
     setPlan: async (req, res) => {
         const { title, start, end } = req.body.SetPlan;
         const { address, time, transportation, memo } = req.body.Start;
-        const { Logding } = req.body;
+        const { lodging } = req.body;
 
         const { loginID } = req.session;
 
@@ -202,8 +202,8 @@ module.exports = {
 
         plan.starting = startting;
 
-        for (let { address, check_in, check_out, price, reservation, memo } of Logding) {
-            const logding = await Lodging.create({
+        for (let { address, check_in, check_out, price, reservation, memo } of lodging) {
+            const lodging = await Lodging.create({
                 _plan: plan._id,
                 addr: address,
                 reser: reservation,
@@ -213,12 +213,15 @@ module.exports = {
                 memo
             })
 
-            plan.lodging.push(logding);
+            plan.lodging.push(lodging);
         }
 
         plan.save();
 
-        res.json({ reulst: true, PID: plan._id }).end();
+        res.json({ 
+            reulst: true, 
+            plan,
+        }).end();
     },
     //일자 별로 계획 설정
     setDayPlan: async (req, res) => {
@@ -374,11 +377,11 @@ module.exports = {
             }
         })
     },
-    //타이틀 플랜 수정
+    //타이틀 플랜 수정 //소진 수정
     editPlan: async (req, res) => {
         const { title, start, end } = req.body.SetPlan;
         const { id, address, time, transportation, memo } = req.body.Start;
-        const { Logding, PlanId } = req.body;
+        const { lodging, PlanId } = req.body;
 
         const { loginID } = req.session;
 
@@ -397,15 +400,17 @@ module.exports = {
             _id: id,
         }, {
             addr: address,
-            time,
+            time: new Date(`${start} ${time}:00`),
             trans: transportation,
             memo
         });
 
-        //logding 수정
-        
+        //lodging 수정
         let updateLog = [];
-        for (let { id, address, check_in, check_out, price, reservation, memo } of Logding) {
+        for (let { id, address, check_in, check_out, price, reservation, memo } of lodging) {
+            console.log('price',price);
+            console.log('reservation',reservation);
+            console.log('reservation',typeof(reservation));
             if (!id) {
                 const lodging = await Lodging.create({
                     addr: address,
@@ -457,6 +462,10 @@ module.exports = {
             }
         })
 
+        const plan = await Plan.findOne({
+            _user: loginID,
+            _id: PlanId,
+        })
 
         res.json({ result: true, plan }).end();
 
@@ -480,12 +489,12 @@ module.exports = {
     //플랜 아이디 필요
     editLodging: async (req, res) => {
         const { loginID } = req.session;
-        const { Logding } = req.body;
+        const { lodging } = req.body;
 
 
         let updateLog = [];
 
-        for (let { id, address, check_in, check_out, price, reservation, memo } of Logding) {
+        for (let { id, address, check_in, check_out, price, reservation, memo } of lodging) {
             if (!!id) {
                 const lodging = await Lodging.create({
                     addr: address,

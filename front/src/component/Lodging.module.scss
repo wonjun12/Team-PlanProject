@@ -1,18 +1,18 @@
-.logdingWrap {
+.lodgingWrap {
   display: grid;
   grid-template-columns: 1fr 1fr;
   .mapDiv{
     background-color: antiquewhite;
     height: 500px;
   }
-  .logdingsDiv{
+  .lodgingsDiv{
     height: 500px;
     overflow-y: auto; 
     .btn{
       margin: 10px 0 10px 10px;
       width: 100px;
     }
-    .logdingDiv {
+    .lodgingDiv {
       label {
         font-size: 15px;
         font-weight: bold;
@@ -84,7 +84,7 @@
         }
       }
   
-      .logdingInfoDiv {
+      .lodgingInfoDiv {
         margin-top: 10px;
         margin-bottom: 10px;
         display: flex;

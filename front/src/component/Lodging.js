@@ -1,17 +1,18 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import Styles from "./Logding.module.scss";
+import Styles from "./Lodging.module.scss";
 import { SetMap, SearchMap } from '../naver/NaverApi';
 import { PlanContext } from "../context/PlanContext";
 
-const Logding = () => {
+const Lodging = () => {
 
-  const { logding, setLogding } = useContext(PlanContext);
+  const { plan, setPlan } = useContext(PlanContext);
 
   //숙소 open index
   const [open, setOpen] = useState(0);
 
   //숙소 정보
   const [log, setLog] = useState([{
+    id: '',
     address: "",
     check_in: "",
     check_out: "",
@@ -20,6 +21,7 @@ const Logding = () => {
     memo: "",
   }]);
 
+  // onchange 함수
   const valueChangeFnc = (e, key, idx, obj) => {
     const changeValue = (key === "reservation") ? e.target.checked : e.target.value;
     let copy = [...log];
@@ -30,10 +32,12 @@ const Logding = () => {
     setLog(copy);
   }
 
+  // 숙소 추가
   const hotelAddFnc = () => {
     setLog([
       ...log,
       {
+        id: '',
         address: "",
         check_in: "",
         check_out: "",
@@ -45,6 +49,7 @@ const Logding = () => {
     setOpen(log.length);
   }
 
+  // 숙소 삭제
   const deleteFnc = (delIdx) => {
     if (delIdx > 0) {
       setLog(log.filter((_, idx) => idx !== delIdx));
@@ -52,11 +57,16 @@ const Logding = () => {
     }
   }
 
+  // 저장
   const hotelPostFnc = () => {
     console.log('log', log);
-    setLogding(log);
+    setPlan({
+      ...plan,
+      lodging: log,
+    })
   }
 
+  // 지도 검색 
   const searchAddFnc = async (idx) => {
 
     const searchCK = await SearchMap(log[idx].address, true);
@@ -72,21 +82,18 @@ const Logding = () => {
   }
 
   useEffect(() => {
-    //수정할 때 get
-    // logding.map((obj, idx) => {
-    // });
-    setLog(logding);
+    setLog(plan.lodging);
   }, []);
 
   return (
-    <div className={Styles.logdingWrap}>
+    <div className={Styles.lodgingWrap}>
       <div className={Styles.mapDiv}>
         <SetMap />
       </div>
-      <div className={Styles.logdingsDiv}>
+      <div className={Styles.lodgingsDiv}>
         {log.map((obj, idx) => {
           return (
-            <div className={Styles.logdingDiv} key={idx}>
+            <div className={Styles.lodgingDiv} key={idx}>
               <div className={Styles.openDiv}>
                 <p>{idx + 1}번째 숙소</p>
                 <span className={Styles.openSpan} onClick={() => setOpen(idx)}>
@@ -119,7 +126,7 @@ const Logding = () => {
                     </div>
                   </label>
 
-                  <div className={Styles.logdingInfoDiv}>
+                  <div className={Styles.lodgingInfoDiv}>
                     <input type="checkbox" id={`reservation${idx}`} checked={obj.reservation}
                       onChange={(e) => valueChangeFnc(e, "reservation", idx, obj)} />
                     <label className={Styles.reservLabel}
@@ -151,4 +158,4 @@ const Logding = () => {
   );
 }
 
-export default Logding;
+export default Lodging;

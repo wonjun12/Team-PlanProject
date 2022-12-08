@@ -10,28 +10,35 @@ const DayPlans = () => {
   const navigate = useNavigate();
 
   const { id, day } = useParams();
-  const { view, setView, dateArr, PLAN_URL, pid, setBaseEditCk } = useContext(PlanContext);
+
+  const { navState, setNavState, plan, setBaseEditCk } = useContext(PlanContext);
+
+  //일정 open index
   const [open, setOpen] = useState(0);
+
+  //상세 설정 CK
   const [detailCk, setDetailCk] = useState(false);
+
   const hourRef = useRef();
   const minuteRef = useRef();
-  const [dayPlan, setDayPlan] = useState([
-    {
-      order: false,
-      address: "",
-      location: "",
-      reservation: false,
-      price: "",
-      time: 0,
-      memo: "",
-      lastLocation: "",
-      lastAddress: ""
-    },
-  ]);
 
+  const [dayPlan, setDayPlan] = useState([{
+    order: false,
+    address: "",
+    location: "",
+    reservation: false,
+    price: "",
+    time: 0,
+    memo: "",
+    lastLocation: "",
+    lastAddress: ""
+  }]);
+
+  //onchange 함수
   const inputChangeFnc = (e, key, idx) => {
 
     let changeValue;
+
     if (key === "time") {
       changeValue = (hourRef.current.value * 60) + (minuteRef.current.value * 1);
     } else if (key === "reservation") {
@@ -49,6 +56,7 @@ const DayPlans = () => {
     setDayPlan(copy);
   }
 
+  //일정 추가
   const dayPlanAddFnc = () => {
     const dayPlanObj = {
       order: false,
@@ -66,6 +74,7 @@ const DayPlans = () => {
     setDetailCk(false);
   }
 
+  //일정 초기화
   const dayPlanReset = () => {
     setDayPlan([{
       order: false,
@@ -80,6 +89,7 @@ const DayPlans = () => {
     }]);
   }
 
+  //일정 삭제
   const deleteFnc = (delIdx) => {
     if (delIdx > 0) {
       setDayPlan(dayPlan.filter((_, idx) => idx !== delIdx));
@@ -88,23 +98,28 @@ const DayPlans = () => {
     }
   }
 
+  // DB 저장
   const dayPlanPostFnc = async () => {
-    console.log('dayPlan',dayPlan);
+    console.log('dayPlan', dayPlan);
     //dayPlan post
-    const res = await axios.post(`${PLAN_URL}/${id}/planDays`, {
-      day: view,
+    const res = await axios.post(`/back/plan/${id}/planDays`, {
+      day: navState.view,
       dayPlan,
       point: [],
       distance: [],
       duration: []
     });
 
+    //저장 후 페이지 이동
     if (res.data.result) {
       setOpen(0);
-      if (view >= dateArr.length - 1) {
+      if (navState.view >= navState.dateArr.length - 1) {
         //setView("PlanView");
       } else {
-        setView(view + 1);
+        setNavState({
+          ...navState,
+          view: navState.view + 1
+        })
       }
     }
   }
@@ -112,17 +127,15 @@ const DayPlans = () => {
   //일자별 계획 GET
   const getDayPlan = async () => {
 
-    //console.log(dateArr[view]);
-    const res = await axios.get(`${PLAN_URL}/${id}/planDays`, {
-      params: { day: view },
+    const res = await axios.get(`/back/plan/${id}/planDays`, {
+      params: { day: navState.view },
     });
 
     if (res.data.dayPlan.length > 0) {
       //이미 작성한 계획이 있으면 state에 담기      
       const { details } = res.data.dayPlan[0];
 
-      console.log('backGet',res.data.dayPlan);
-
+      //console.log('backGet', res.data.dayPlan);
       let planArr = [];
       details.map((obj) => {
         planArr.push({
@@ -139,7 +152,7 @@ const DayPlans = () => {
       });
 
       //마지막 날짜인 경우 last 정보를 0번째 배열에 넣는다
-      if(view === dateArr.length-1){
+      if (navState.view === navState.dateArr.length - 1) {
         planArr[0].lastLocation = details[0].last.location;
         planArr[0].lastAddress = details[0].last.addr;
       }
@@ -165,7 +178,7 @@ const DayPlans = () => {
   }
 
   const pageBackFnc = () => {
-    setView('STEP1');
+    setNavState({...navState, view: 'STEP1'});
     setBaseEditCk(true);
     navigate('/newplan');
   }
@@ -173,7 +186,7 @@ const DayPlans = () => {
   useEffect(() => {
     //dayPlan get
     getDayPlan();
-  }, [view])
+  }, [navState.view])
 
   return (
     <div className={Styles.dayPlanWrap}>
@@ -181,8 +194,8 @@ const DayPlans = () => {
         <SetMap />
       </div>
       <div className={Styles.dayPlanDiv}>
-        <input type="button" value="뒤로가기(초기세팅수정)" onClick={pageBackFnc}/>
-        {(view === dateArr.length - 1) && (
+        <input type="button" value="뒤로가기(초기세팅수정)" onClick={pageBackFnc} />
+        {(navState.view === navState.dateArr.length - 1) && (
           <div className={Styles.lastLocDiv}>
             <label>최종 도착지 이름<br />
               <input type="text" value={dayPlan[0].lastLocation}

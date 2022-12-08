@@ -7,7 +7,7 @@ import { PlanContext } from "../context/PlanContext";
 
 const SetDate = () => {
 
-  const { setView, setDateArr, baseData, setBaseData } = useContext(PlanContext);
+  const { navState, setNavState, plan, setPlan } = useContext(PlanContext);
 
   //여행 기본 정보
   const [base, setBase] = useState({
@@ -17,6 +17,7 @@ const SetDate = () => {
     title: '',
   });
 
+  //달력 표시 state
   const [calDate, SetCalDate] = useState([new Date(),new Date()]);
 
   //날짜 유효성 CK
@@ -36,7 +37,7 @@ const SetDate = () => {
     // return `${yyyy}-${mm}-${dd}-${dayStr[day]}`;
   }
 
-  // 
+  //일자 계산
   const getDays = (start, end) => {
     const time = Math.abs(start.getTime() - end.getTime());
     return Math.ceil(time / (1000*60*60*24));
@@ -59,36 +60,48 @@ const SetDate = () => {
   const setDate = () => {
     let arr = [];
     let date = new Date(base.start);
-    for (let i = 1; i <= parseInt(base.days); i++) {
+    for (let i = 0; i < parseInt(base.days); i++) {
       const dateStr = getDate(date);
       arr.push(
         dateStr
       );
       date.setDate(date.getDate() + 1);
     }
-    setDateArr(arr);
+    console.log(arr);
+    setNavState({...navState, dateArr: arr});
   }
 
   //기본 정보 설정 완료
   const setDatePostFnc = () => {
 
     console.log('setDate', base);
-
-    //날짜 배열 set
-    setDate();
-
+    
     //기본 정보 set
-    setBaseData(base);
+    setPlan({
+      ...plan,
+      baseData: base,
+    })
 
-    //view 변경
-    setView("STEP2");
+    //날짜 배열 set / view 변경
+    let arr = [];
+    let date = new Date(base.start);
+    for (let i = 0; i < parseInt(base.days); i++) {
+      const dateStr = getDate(date);
+      arr.push(
+        dateStr
+      );
+      date.setDate(date.getDate() + 1);
+    }
+    console.log(arr);
+    setNavState({view: 'STEP2', dateArr: arr});
+
   }
 
   useEffect(() => {
     //수정할 때 get
-    if(baseData.start !== "" && baseData.end !== ""){
-      setBase(baseData);
-      SetCalDate([new Date(baseData.start), new Date(baseData.end)]);
+    if(plan.baseData.start !== "" && plan.baseData.end !== ""){
+      setBase(plan.baseData);
+      SetCalDate([new Date(plan.baseData.start), new Date(plan.baseData.end)]);
       setDateCK(false);
     }
   }, []);
