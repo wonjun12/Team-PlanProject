@@ -9,7 +9,8 @@ import DayPlan from "../component/DayPlan";
 
 import PlanView from "../component/PlanView";
 
-import { ThemeContext } from "../context/ThemeContext";
+import { PlanContext } from "../context/PlanContext";
+import axios from "axios";
 // $('input').attr('autocomplete','off'); //input 자동완성 끄기
 
 const NewPlan = () => {
@@ -18,7 +19,7 @@ const NewPlan = () => {
   const [pid, setPid] = useState("");
 
   //server_url
-  const PLAN_URL = 'http://localhost:3000/back/plan';
+  const PLAN_URL = '/back/plan';
 
   //View Content
   const [view, setView] = useState("STEP1");
@@ -26,8 +27,17 @@ const NewPlan = () => {
   //날짜 배열
   const [dateArr, setDateArr] = useState([]);
 
+  //여행 기본 정보
+  const [baseData, setBaseData] = useState({
+    start: '',
+    end: '',
+    days: '',
+    title: '',
+  });
+
   //출발 정보
   const [startPlan, setStartPlan] = useState({
+    id: '',
     address: "",
     time: "",
     transportation: "car",
@@ -36,6 +46,7 @@ const NewPlan = () => {
 
   //숙소 정보
   const [logding, setLogding] = useState([{
+    id: '',
     address: "",
     check_in: "",
     check_out: "",
@@ -44,19 +55,27 @@ const NewPlan = () => {
     memo: "",
   }]);
 
+  //수정 페이지 CK
+  const [baseEditCk, setBaseEditCk] = useState(false);
+
+  useEffect(() => {
+    console.log(baseEditCk);
+  }, [baseEditCk]);
+
   return (
     <div className={Styles.container}>
 
-      <ThemeContext.Provider
+      <PlanContext.Provider
         value={{ view, setView, dateArr, setDateArr, pid, setPid, PLAN_URL, 
-          startPlan, setStartPlan, logding, setLogding }}>
+          baseData, setBaseData, startPlan, setStartPlan, logding, setLogding, baseEditCk, setBaseEditCk }}>
         <NewPlanNav />
         <Routes>
+          <Route path="/" element={<SetPlan />} />
           <Route path="/" element={<SetPlan />} />
           <Route path="/dayplan/:id/:day" element={<DayPlan />} />
         </Routes>
 
-      </ThemeContext.Provider>
+      </PlanContext.Provider>
     </div>
   );
 }

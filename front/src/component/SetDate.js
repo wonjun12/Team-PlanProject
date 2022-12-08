@@ -3,11 +3,11 @@ import { Calendar } from "react-calendar";
 import Styles from "./SetDate.module.scss";
 import './Calendar.css';
 
-import { ThemeContext } from "../context/ThemeContext";
+import { PlanContext } from "../context/PlanContext";
 
-const SetDate = ({baseData, setBaseData}) => {
+const SetDate = () => {
 
-  const { setView, setDateArr } = useContext(ThemeContext);
+  const { setView, setDateArr, baseData, setBaseData } = useContext(PlanContext);
 
   //여행 기본 정보
   const [base, setBase] = useState({
@@ -31,6 +31,7 @@ const SetDate = ({baseData, setBaseData}) => {
 
     return `${yyyy}-${mm}-${dd}`;
 
+    //요일 숫자로 넘기기
     // const dayStr = ["일","월","화","수","목","금","토"];
     // return `${yyyy}-${mm}-${dd}-${dayStr[day]}`;
   }
@@ -71,6 +72,8 @@ const SetDate = ({baseData, setBaseData}) => {
   //기본 정보 설정 완료
   const setDatePostFnc = () => {
 
+    console.log('setDate', base);
+
     //날짜 배열 set
     setDate();
 
@@ -108,7 +111,7 @@ const SetDate = ({baseData, setBaseData}) => {
           {(base.days !== 0 && base.days !== "") && 
             <p>{base.days - 1}박 {base.days}일</p>}
 
-          <input type="button" value="다음" disabled={dateCK} onClick={setDatePostFnc}/>
+          <input type="button" value="저장" disabled={dateCK} onClick={setDatePostFnc}/>
         </div>
       </div>
     </div>

@@ -259,17 +259,15 @@ module.exports = {
 
         calender.save();
 
-        //소진 last 출력이 안됨
-        console.log(calender);
         res.json({ result: true }).end();
 
     },
     //내정보 계획표 목록 보기
     myPlan: async (req, res) => {
+        //소진 수정
         const { loginID } = req.session;
-
         const plans = await Plan.find({
-            _user: loginID
+            _user: loginID,
         }).populate(['starting', 'lodging']).sort({ 'created_at': -1 });
 
         res.json({ result: true, plans }).end();
@@ -378,18 +376,89 @@ module.exports = {
     },
     //타이틀 플랜 수정
     editPlan: async (req, res) => {
-        const { loginID } = req.session;
         const { title, start, end } = req.body.SetPlan;
+        const { id, address, time, transportation, memo } = req.body.Start;
+        const { Logding, PlanId } = req.body;
 
+        const { loginID } = req.session;
+
+        //base 수정
         await Plan.updateOne({
-            _user: loginID
+            _user: loginID,
+            _id: PlanId,
         }, {
             title,
             start,
             end
         });
 
-        res.json({ result: true }).end();
+        //start 수정
+        await Starting.updateOne({
+            _id: id,
+        }, {
+            addr: address,
+            time,
+            trans: transportation,
+            memo
+        });
+
+        //logding 수정
+        
+        let updateLog = [];
+        for (let { id, address, check_in, check_out, price, reservation, memo } of Logding) {
+            if (!id) {
+                const lodging = await Lodging.create({
+                    addr: address,
+                    reser: reservation,
+                    check_in,
+                    check_out,
+                    price,
+                    memo
+                });
+
+                //플랜 아이디 필요
+                await Plan.updateOne({
+                    _id: PlanId,
+                    _user: loginID
+                }, {
+                    $push: {
+                        lodging
+                    }
+                })
+
+            } else {
+                await Lodging.updateOne({
+                    _id: id
+                }, {
+                    addr: address,
+                    reser: reservation,
+                    check_in,
+                    check_out,
+                    price,
+                    memo
+                })
+
+                updateLog.push(id);
+            }
+        }
+
+        const deleteLodging = await Lodging.deleteMany({
+            _id: {
+                $nin: updateLog
+            }
+        })
+
+        await Plan.updateOne({
+            _id: PlanId,
+            _user: loginID
+        }, {
+            $pullAll: {
+                lodging: deleteLodging
+            }
+        })
+
+
+        res.json({ result: true, plan }).end();
 
     },
     //출발지 설정

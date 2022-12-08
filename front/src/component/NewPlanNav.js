@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
+import { PlanContext } from "../context/PlanContext";
 import Styles from "../route/NewPlan.module.scss";
 
 const NewPlanNav = () => {
 
   const navigate = useNavigate();
 
-  const { view, setView, dateArr, pid } = useContext(ThemeContext);
+  const { view, setView, dateArr, pid } = useContext(PlanContext);
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -28,13 +28,13 @@ const NewPlanNav = () => {
 
   //날짜 클릭
   const planMovekFnc = (step, idx) => {
-    
+    navigate(`/`);
     setView(idx);
   }
 
   useEffect(() => {
 
-    console.log(view);
+    console.log("view : ",view);
 
     if(typeof(view) === 'number'){
 
@@ -43,7 +43,6 @@ const NewPlanNav = () => {
       }else if(view < 5 && view < (currentIndex + 5)){
         setCurrentIndex(0);
       }
-      
       navigate(`dayplan/${pid}/${dateArr[view]}`);
     }
   }, [view]);
@@ -60,8 +59,13 @@ const NewPlanNav = () => {
 
   return (
     <div className={Styles.navWrap}>
-      <div className={Styles.prevBtn} onClick={navPrevFnc}>◀</div>
-      <div className={Styles.nextBtn} onClick={navNextFnc}>▶</div>
+      {(typeof(step) === 'number') && 
+        <>
+          <div className={Styles.prevBtn} onClick={navPrevFnc}>◀</div>
+          <div className={Styles.nextBtn} onClick={navNextFnc}>▶</div>
+        </>
+      }
+      
       <div className={Styles.navDiv}>
         {(view === 'STEP1' || view === 'STEP2' || view === 'STEP3') ? (
           startNav.map((step, idx) => {

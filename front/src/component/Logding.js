@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Styles from "./Logding.module.scss";
 import { SetMap, SearchMap } from '../naver/NaverApi';
-import { ThemeContext } from "../context/ThemeContext";
+import { PlanContext } from "../context/PlanContext";
 
 const Logding = () => {
 
-  const { logding, setLogding } = useContext(ThemeContext);
+  const { logding, setLogding } = useContext(PlanContext);
 
   //숙소 open index
   const [open, setOpen] = useState(0);
@@ -53,7 +53,7 @@ const Logding = () => {
   }
 
   const hotelPostFnc = () => {
-
+    console.log('log', log);
     setLogding(log);
   }
 
@@ -77,8 +77,6 @@ const Logding = () => {
     // });
     setLog(logding);
   }, []);
-
-  console.log(log);
 
   return (
     <div className={Styles.logdingWrap}>

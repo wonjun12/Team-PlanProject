@@ -64,6 +64,7 @@ function App() {
 
 
             <Route path="/newplan/*" element={<NewPlan />}></Route>
+            {/* <Route path="/editplan/*" element={<NewPlan />}></Route> */}
             
             <Route path="/viewplan" element={<ViewPlan/>}></Route>
 

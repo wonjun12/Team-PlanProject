@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import { PlanContext } from "../context/PlanContext";
 import Styles from "./Start.module.scss";
 import { SetMap, SearchMap } from '../naver/NaverApi';
 
 const Start = () => {
 
-  const { setView, startPlan, setStartPlan } = useContext(ThemeContext);
+  const { setView, startPlan, setStartPlan } = useContext(PlanContext);
 
   //출발 정보
   const [start, setStart] = useState({
@@ -16,6 +16,7 @@ const Start = () => {
   });
 
   const startPostFnc = () => {
+    console.log('start', start);
     setView("STEP3");
     setStartPlan(start);
   }
@@ -86,7 +87,7 @@ const Start = () => {
           }))}
         ></textarea>
 
-        <input type="button" value="다음" onClick={startPostFnc} />
+        <input type="button" value="저장" onClick={startPostFnc} />
       </div>
     </div>
   );

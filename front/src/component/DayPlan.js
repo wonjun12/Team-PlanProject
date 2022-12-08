@@ -1,14 +1,16 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { ThemeContext } from "../context/ThemeContext";
+import { PlanContext } from "../context/PlanContext";
 import Styles from "./DayPlan.module.scss";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SetMap, SearchMap } from '../naver/NaverApi';
 
 const DayPlans = () => {
 
+  const navigate = useNavigate();
+
   const { id, day } = useParams();
-  const { view, setView, dateArr, PLAN_URL, pid } = useContext(ThemeContext);
+  const { view, setView, dateArr, PLAN_URL, pid, setBaseEditCk } = useContext(PlanContext);
   const [open, setOpen] = useState(0);
   const [detailCk, setDetailCk] = useState(false);
   const hourRef = useRef();
@@ -56,6 +58,8 @@ const DayPlans = () => {
       price: "",
       time: 0,
       memo: "",
+      lastLocation: "",
+      lastAddress: "",
     }
     setDayPlan([...dayPlan, dayPlanObj]);
     setOpen(dayPlan.length);
@@ -71,6 +75,8 @@ const DayPlans = () => {
       price: "",
       time: 0,
       memo: "",
+      lastLocation: "",
+      lastAddress: "",
     }]);
   }
 
@@ -83,6 +89,7 @@ const DayPlans = () => {
   }
 
   const dayPlanPostFnc = async () => {
+    console.log('dayPlan',dayPlan);
     //dayPlan post
     const res = await axios.post(`${PLAN_URL}/${id}/planDays`, {
       day: view,
@@ -116,10 +123,6 @@ const DayPlans = () => {
 
       console.log('backGet',res.data.dayPlan);
 
-      if(view === dateArr.length-1){
-
-      }
-
       let planArr = [];
       details.map((obj) => {
         planArr.push({
@@ -130,8 +133,17 @@ const DayPlans = () => {
           price: obj.price,
           time: obj.time,
           memo: obj.memo,
+          lastLocation: "",
+          lastAddress: "",
         });
       });
+
+      //마지막 날짜인 경우 last 정보를 0번째 배열에 넣는다
+      if(view === dateArr.length-1){
+        planArr[0].lastLocation = details[0].last.location;
+        planArr[0].lastAddress = details[0].last.addr;
+      }
+
       setDayPlan(planArr);
     } else {
       //처음 작성하는 계획이면 초기화
@@ -152,6 +164,12 @@ const DayPlans = () => {
     }
   }
 
+  const pageBackFnc = () => {
+    setView('STEP1');
+    setBaseEditCk(true);
+    navigate('/newplan');
+  }
+
   useEffect(() => {
     //dayPlan get
     getDayPlan();
@@ -163,15 +181,16 @@ const DayPlans = () => {
         <SetMap />
       </div>
       <div className={Styles.dayPlanDiv}>
+        <input type="button" value="뒤로가기(초기세팅수정)" onClick={pageBackFnc}/>
         {(view === dateArr.length - 1) && (
           <div className={Styles.lastLocDiv}>
             <label>최종 도착지 이름<br />
-              <input type="text" value={dayPlan.lastLocation}
+              <input type="text" value={dayPlan[0].lastLocation}
                 onChange={(e) => inputChangeFnc(e, "lastLocation", 0)}
               />
             </label>
             <label>최종 도착지 주소<br />
-              <input type="text" value={dayPlan.lastAddress}
+              <input type="text" value={dayPlan[0].lastAddress}
                 onChange={(e) => inputChangeFnc(e, "lastAddress", 0)}
               />
             </label>
