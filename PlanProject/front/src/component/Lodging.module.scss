@@ -1,0 +1,118 @@
+.lodgingWrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  .mapDiv{
+    background-color: antiquewhite;
+    height: 500px;
+  }
+  .lodgingsDiv{
+    height: 500px;
+    overflow-y: auto; 
+    .btn{
+      margin: 10px 0 10px 10px;
+      width: 100px;
+    }
+    .lodgingDiv {
+      label {
+        font-size: 15px;
+        font-weight: bold;
+      }
+  
+      input,
+      select,
+      textarea {
+        font-size: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+      }
+
+
+      .openDiv {
+        height: 22px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+  
+        p {
+          margin: 0;
+          color: white;
+          font-size: 15px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+        }
+  
+        .openSpan {
+          cursor: pointer;
+          position: absolute;
+          color: white;
+          font-size: 22px;
+          top: -8px;
+          right: 0;
+        }
+      }
+
+      .addDiv{
+        display: flex;
+        justify-content: space-between;
+        input[type='text']{
+          width: 390px;
+        }
+        input[type='button']{
+          width: 70px;
+          height: 30px;
+          margin-top: 18px;
+        }
+      }
+  
+      border-bottom: 1px solid white;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+  
+      .logDateDiv {
+        display: flex;
+        height: 40px;
+  
+        .dateText {
+          font-size: 30px;
+          display: flex;
+          align-items: center;
+          margin: 0 50px;
+        }
+      }
+  
+      .lodgingInfoDiv {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+  
+        .priceLabel {
+          margin-left: 60px;
+          margin-right: 10px;
+        }
+  
+        input[type='checkbox'] {
+          margin: 0;
+          margin-right: 10px;
+          width: 20px;
+          height: 20px;
+        }
+  
+        input[type='number'] {
+          margin: 0;
+          width: 200px;
+        }
+      }
+  
+      .deleteBtn {
+        width: 100px;
+        align-self: flex-end;
+      }
+    }
+
+  } 
+}

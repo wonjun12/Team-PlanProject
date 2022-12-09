@@ -1,0 +1,45 @@
+.startWrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  .mapDiv {
+    background-color: antiquewhite;
+    height: 500px;
+  }
+
+  .planDiv {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    p {
+      display: flex;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    input,
+    select,
+    textarea {
+      font-size: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .addDiv{
+      display: flex;
+      justify-content: space-between;
+      input[type='text']{
+        width: 70%;
+      }
+      input[type='button']{
+        width: 70px;
+      }
+    }
+  }
+}

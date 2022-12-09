@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import styled from "./Join.module.scss";
 import axiosPost from "../Axios/backAxiosPost";
 import JoinFailed from "../check/joinFailed";
+import Loading from "../loading/Loading";
+
 
 const JoinInput = ({toLogin, joinChangeBack}) => {
     const [PWD, setPWD] = useState('');
@@ -14,6 +16,8 @@ const JoinInput = ({toLogin, joinChangeBack}) => {
     const [pwdCk, setPwdCk] = useState(false);
 
     const [failed, setFailed] = useState({fail: false, index: 0});
+
+    const [loading, setLoading] = useState(false);
     
 
     useEffect(() => {
@@ -30,6 +34,7 @@ const JoinInput = ({toLogin, joinChangeBack}) => {
 
     const joinFnc = async (e) => {
         e.preventDefault();
+        setLoading(true);
         const {email, name, pwd, pwdCkV} = e.target;
         if(emailCk && nameCk && pwdCk && !(PWD.length < 8)){
             const joinData = {
@@ -51,6 +56,9 @@ const JoinInput = ({toLogin, joinChangeBack}) => {
             setFailed({fail: true, index:3});
             pwdCkV.focus();
         }
+
+        setLoading(false);
+        
     }
 
     const emailCkFnc = async (e) => {
@@ -83,7 +91,8 @@ const JoinInput = ({toLogin, joinChangeBack}) => {
         const { value } = e.target;
         const pwdRegEx = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
         setPWD(value);
-        if(pwdRegEx.test(value)){
+        console.log(!pwdRegEx.test(value));
+        if(!pwdRegEx.test(value)){
             setFailed({fail: true, index:2});
         }else if(PWDCk !== value && PWDCk !== ''){
             setFailed({fail: true, index:3});
@@ -111,6 +120,8 @@ const JoinInput = ({toLogin, joinChangeBack}) => {
 
 
     return (
+        <>
+        {loading && <Loading/>}
         <form onSubmit={joinFnc} id="joinFormId" className={joinChangeBack? styled.joinFormBack : styled.joinForm}>
             <div className={styled.mainJoin}>
                <input onChange={emailCkFnc} name="email" placeholder="이메일"/>
@@ -125,6 +136,7 @@ const JoinInput = ({toLogin, joinChangeBack}) => {
             </div>
             
         </form>
+        </>
     );
 };
 

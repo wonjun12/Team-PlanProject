@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Calendar } from "react-calendar";
-import Styles from "../route/SetPlan.module.scss";
+import Styles from "./SetDate.module.scss";
 import './Calendar.css';
 
-import { ThemeContext } from "../context/ThemeContext";
+import { PlanContext } from "../context/PlanContext";
 
-const SetDate = ({baseData, setBaseData}) => {
+const SetDate = () => {
 
-  const { setView, setDateArr } = useContext(ThemeContext);
+  const { navState, setNavState, plan, setPlan } = useContext(PlanContext);
 
   //여행 기본 정보
   const [base, setBase] = useState({
@@ -16,6 +16,9 @@ const SetDate = ({baseData, setBaseData}) => {
     days: '',
     title: '',
   });
+
+  //달력 표시 state
+  const [calDate, SetCalDate] = useState([new Date(),new Date()]);
 
   //날짜 유효성 CK
   const [dateCK, setDateCK] = useState(true);
@@ -26,11 +29,15 @@ const SetDate = ({baseData, setBaseData}) => {
     const mm = date.getMonth() + 1;
     const dd = date.getDate();
     const day = date.getDay();
-    const dayStr = ["일","월","화","수","목","금","토"];
-    return `${yyyy}-${mm}-${dd}-${dayStr[day]}`;
+
+    return `${yyyy}-${mm}-${dd}`;
+
+    //요일 숫자로 넘기기
+    // const dayStr = ["일","월","화","수","목","금","토"];
+    // return `${yyyy}-${mm}-${dd}-${dayStr[day]}`;
   }
 
-  // 
+  //일자 계산
   const getDays = (start, end) => {
     const time = Math.abs(start.getTime() - end.getTime());
     return Math.ceil(time / (1000*60*60*24));
@@ -38,6 +45,7 @@ const SetDate = ({baseData, setBaseData}) => {
 
   //onChange 함수
   const changeDate = (ranges) => {
+    SetCalDate(ranges);
     const days = getDays(ranges[0],ranges[1]);
     setBase({
       ...base,
@@ -51,51 +59,73 @@ const SetDate = ({baseData, setBaseData}) => {
   //날짜 설정
   const setDate = () => {
     let arr = [];
-    let date = new Date(base.start.substring(0, base.start.length - 2));
-    for (let i = 1; i <= parseInt(base.days); i++) {
+    let date = new Date(base.start);
+    for (let i = 0; i < parseInt(base.days); i++) {
+      const dateStr = getDate(date);
       arr.push(
-        `${date.getMonth() + 1}월${date.getDate()}일`
+        dateStr
       );
       date.setDate(date.getDate() + 1);
     }
-    setDateArr(arr);
+    console.log(arr);
+    setNavState({...navState, dateArr: arr});
   }
 
   //기본 정보 설정 완료
   const setDatePostFnc = () => {
 
-    //날짜 배열 set
-    setDate();
-
+    console.log('setDate', base);
+    
     //기본 정보 set
-    setBaseData(base);
+    setPlan({
+      ...plan,
+      baseData: base,
+    })
 
-    //view 변경
-    setView("STEP2");
+    //날짜 배열 set / view 변경
+    let arr = [];
+    let date = new Date(base.start);
+    for (let i = 0; i < parseInt(base.days); i++) {
+      const dateStr = getDate(date);
+      arr.push(
+        dateStr
+      );
+      date.setDate(date.getDate() + 1);
+    }
+    console.log(arr);
+    setNavState({view: 'STEP2', dateArr: arr});
+
   }
 
   useEffect(() => {
     //수정할 때 get
-    setBase(baseData);
+    if(plan.baseData.start !== "" && plan.baseData.end !== ""){
+      setBase(plan.baseData);
+      SetCalDate([new Date(plan.baseData.start), new Date(plan.baseData.end)]);
+      setDateCK(false);
+    }
   }, []);
 
   return (
-    <div className={Styles.container}>
-      <label>여행 제목
-        <input type="text" value={base.title} 
-          onChange={(e) => setBase({...base, title: e.target.value})} />
-      </label>
+    <div className={Styles.setDateWrap}>
       <Calendar
         onChange={changeDate}
         selectRange={true}
+        value={calDate}
       />
-      <div className={Styles.deteDiv}>
-        <p>Start : {base.start}</p>
-        <p>End : {base.end}</p>
-        {(base.days !== 0 && base.days !== "") && 
-          <p>{base.days - 1}박 {base.days}일</p>}
+      <div className={Styles.setDateDiv}>
+        <p className={Styles.hello}>HELLO USER</p>
+        <label htmlFor="title">여행 제목</label>
+        <input id="title" type="text" value={base.title} 
+          onChange={(e) => setBase({...base, title: e.target.value})} />
+        <div className={Styles.textDiv}>
+          <p>START : {base.start}</p>
+          <p>END : {base.end}</p>
+          {(base.days !== 0 && base.days !== "") && 
+            <p>{base.days - 1}박 {base.days}일</p>}
 
-        <input type="button" value="다음" disabled={dateCK} onClick={setDatePostFnc}/>
+          <input type="button" value="저장" disabled={dateCK} onClick={setDatePostFnc}/>
+        </div>
       </div>
     </div>
   );

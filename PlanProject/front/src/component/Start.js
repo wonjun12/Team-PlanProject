@@ -1,41 +1,69 @@
-import React, { useContext, useEffect, useState } from "react";
-import { ThemeContext } from "../context/ThemeContext";
-import Styles from "../route/SetPlan.module.scss";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { PlanContext } from "../context/PlanContext";
+import Styles from "./Start.module.scss";
+import { SetMap, SearchMap } from '../naver/NaverApi';
 
-const Start = ({startPlan, setStartPlan}) => {
+const Start = () => {
 
-  const { setView } = useContext(ThemeContext);
+  const { navState, setNavState, plan, setPlan } = useContext(PlanContext);
 
   //출발 정보
   const [start, setStart] = useState({
+    id: '',
     address: "",
     time: "",
     transportation: "car",
     memo: "",
   });
 
-  const startPostFnc = ()=> {
-    setView("STEP3");
-    setStartPlan(start);
+  //저장
+  const startPostFnc = () => {
+    console.log('start', start);
+    setNavState({
+      ...navState,
+      view: 'STEP3'
+    });
+    setPlan({
+      ...plan,
+      startPlan: start
+    });
+  }
+
+  //지도 검색
+  const searchAddFnc = async () => {
+    const searchCK = await SearchMap(start.address, true);
+    if (!searchCK) {
+      setStart((prev) => ({
+        ...prev,
+        address: "",
+      }))
+      alert('주소를 다시 검색해주세요');
+    }
   }
 
   useEffect(() => {
     //수정할 때 get
-    setStart(startPlan);
-  },[]);
-
+    setStart(plan.startPlan);
+  }, []);
+  
   return (
-    <div  className={Styles.startWrap}>
-      <p>출발지 설정</p>
+    <div className={Styles.startWrap}>
+
+      <div className={Styles.mapDiv}>
+        <SetMap />
+      </div>
+
       <div className={Styles.planDiv}>
-        <label htmlFor="address">주소</label>
-        <input type="text" id="address"
-          value={start.address}
-          onChange={(e) => setStart((prev) => ({
-            ...prev,
-            address: e.target.value,
-          }))}
-        />
+        <p>출발지 설정</p>
+        <div className={Styles.addDiv}>
+          <label htmlFor="address">주소</label>
+          <input type="text" id="address" value={start.address}
+            onChange={(e) => setStart((prev) => ({
+              ...prev,
+              address: e.target.value,
+            }))}/>
+          <input type="button" value="검색" onClick={searchAddFnc} />
+        </div>
 
         <label htmlFor="departure">출발시간</label>
         <input type="time" id="departure"
@@ -43,11 +71,10 @@ const Start = ({startPlan, setStartPlan}) => {
           onChange={(e) => setStart((prev) => ({
             ...prev,
             time: e.target.value,
-          }))}
-        />
+          }))} />
 
         <label htmlFor="transportation">이동수단</label>
-        <select id="transportation" 
+        <select id="transportation"
           onChange={(e) => setStart((prev) => ({
             ...prev,
             transportation: e.target.value,
@@ -58,7 +85,7 @@ const Start = ({startPlan, setStartPlan}) => {
         </select>
 
         <label htmlFor="memo">메모</label>
-        <textarea id="memo" rows="12"
+        <textarea id="memo" rows="8"
           value={start.memo}
           onChange={(e) => setStart((prev) => ({
             ...prev,
@@ -66,7 +93,7 @@ const Start = ({startPlan, setStartPlan}) => {
           }))}
         ></textarea>
 
-        <button onClick={startPostFnc}>숙소설정</button>
+        <input type="button" value="저장" onClick={startPostFnc} />
       </div>
     </div>
   );

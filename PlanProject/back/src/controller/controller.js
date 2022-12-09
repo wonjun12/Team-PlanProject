@@ -158,10 +158,15 @@ module.exports = {
         
         //1시간 후 인증되어 있지 않다면 삭제
         setTimeout(async () => {
-            const user = await User.findOne({email});
-            if(!(user.emailCk)){
-                await User.deleteOne({email:user.email});
+            try{
+                const user = await User.findOne({email});
+                if(!(user.emailCk)){
+                    await User.deleteOne({email:user.email});
+                }
+            }catch{
+
             }
+            
         }, timeOut);
         
         //이메일 전송
@@ -177,46 +182,51 @@ module.exports = {
     //계획표 작성
     //출발지 및 숙소 설정
     setPlan: async (req, res) => {
-        const {title, start, end} = req.body.SetPlan;
-        const {address, time, transportation, memo} = req.body.Start;
-        const {Logding} = req.body;
+        const { title, start, end } = req.body.SetPlan;
+        const { address, time, transportation, memo } = req.body.Start;
+        const { lodging } = req.body;
 
-        const {loginID} = req.session;
+        const { loginID } = req.session;
+
 
         const plan = await Plan.create({
-            _user : loginID,
+            _user: loginID,
             title,
             start,
             end
         });
-        
+
 
         const startting = await Starting.create({
             _plan: plan._id,
-            addr : address,
-            time,
+            addr: address,
+            time: new Date(`${start} ${time}:00`),
             trans: transportation,
             memo
         });
 
         plan.starting = startting;
 
-        await Logding.forEach(async ({address, check_in, check_out, price, reservation, memo}) => {
-            const logding = await Lodging.create({
+        for (let { address, check_in, check_out, price, reservation, memo } of lodging) {
+            const lodging = await Lodging.create({
                 _plan: plan._id,
-                addr : address,
+                addr: address,
                 reser: reservation,
                 check_in,
                 check_out,
                 price,
                 memo
             })
-            plan.lodging.push(logding);
-        });
+
+            plan.lodging.push(lodging);
+        }
 
         plan.save();
 
-        res.json({reulst: true, PID: plan._id}).end();
+        res.json({
+            reulst: true,
+            plan,
+        }).end();
     },
     //일자 별로 계획 설정
     setDayPlan: async (req, res) => {
@@ -235,7 +245,7 @@ module.exports = {
         });
 
         let count = 0;
-        await dayPlan.forEach(async ({address, location, reservation, price, time, order, memo, lastLocation, lastAddress}) => {
+        for(let {address, location, reservation, price, time, memo, lastLocation, lastAddress} of dayPlan){
             const dayplan = await Details.create({
                 _plan: id,
                 addr: address,
@@ -245,14 +255,14 @@ module.exports = {
                 time,
                 memo,
                 count: count++,
-                order,
                 last : {
                     addr : lastAddress,
                     location : lastLocation
                 }
             });
+            
             calender.details.push(dayplan);
-        })
+        }
 
         calender.save();
 
@@ -265,8 +275,8 @@ module.exports = {
 
         const plans = await Plan.find({
             _user: loginID
-        }).populate('starting', 'lodging').sort({'created_at' : -1});
-
+        }).sort({'created_at' : -1});
+        
         res.json({result : true, plans}).end();
     },
     //작성한 계획표 일자별 보기
@@ -275,10 +285,8 @@ module.exports = {
         const {day} = req.query;
 
         const dayPlan = await Calendar.find({
-            _id : {
-                day,
-                plan: id
-            }
+            '_id.day' : day,
+            '_id.plan' : id
         }).populate({
             path: 'details',
             options: {
@@ -291,14 +299,22 @@ module.exports = {
         res.json({result: true, dayPlan}).end();
     },
     //일자별 계획 수정
-    //플랜아이디 필요함
-    editDayPlan : async (req, res) => {
-        const {id} = req.params;
-        const {dayPlan} = req.body;
+    editDayPlan: async (req, res) => {
+        const { id } = req.params;
+        const { dayPlan, day, point, distance, duration } = req.body;
 
-        let count = 0, updateDays = [];
-        await dayPlan.forEach(async ({id, address, location, reservation, price, time, order, memo, lastLocation, lastAddress}) => {
-            if(id === 0){
+        await Calendar.updateOne({
+            '_id.day' : day,
+            '_id.plan' : id
+        }, {
+            point,
+            distance,
+            duration
+        })
+
+        let count = 0, updateDays = [], createDays = [];
+        for (let { id, address, location, reservation, price, time, memo, lastLocation, lastAddress } of dayPlan) {
+            if (!id) {
                 const dayplan = await Details.create({
                     _plan: id,
                     addr: address,
@@ -308,25 +324,14 @@ module.exports = {
                     time,
                     memo,
                     count: count++,
-                    order,
-                    last : {
-                        addr : lastAddress,
-                        location : lastLocation
+                    last: {
+                        addr: lastAddress,
+                        location: lastLocation
                     }
                 });
 
-                //플랜아이디 필요
-                await Calendar.updateOne({
-                    _id : {
-                        day,
-                        plan : id
-                    }
-                },{
-                    $push : {
-                        details : dayplan
-                    }
-                })
-            }else {
+                createDays.push(dayPlan);
+            } else {
                 await Details.updateOne({
                     _id: id
                 }, {
@@ -337,77 +342,82 @@ module.exports = {
                     time,
                     memo,
                     count: count++,
-                    order,
-                    last : {
-                        addr : lastAddress,
-                        location : lastLocation
+                    last: {
+                        addr: lastAddress,
+                        location: lastLocation
                     }
                 });
                 updateDays.push(id);
-            } 
-        });
+            }
+        }
 
-        
-        const deleteDetails = await Details.deleteMany({
-            _id : {
-                $nin : updateDays
+        const daysArray = updateDays.concat(createDays);
+
+        await Details.deleteMany({
+            _id: {
+                $nin: daysArray
             }
         })
 
         await Calendar.updateOne({
-            _id : {
-                day,
-                plan: id
-            }
-        },{
-            $pullAll : {
-                details : deleteDetails
+            '_id.day' : day,
+            '_id.plan' : id
+        }, {
+            $pull: {
+                details: {
+                    $nin : daysArray
+                }
             }
         })
+
+        await Calendar.updateOne({
+            '_id.day' : day,
+            '_id.plan' : id
+        }, {
+            $push: {
+                details: {
+                    $each : createDays
+                }
+            }
+        }) 
+        
+        res.json({result: true}).end();
     },
     //타이틀 플랜 수정
-    editPlan : async (req, res) => {
-        const {loginID} = req.session;
-        const {title, start, end} = req.body.SetPlan;
+    editPlan: async (req, res) => {
+        const { title, start, end } = req.body.SetPlan;
+        const { id, address, time, transportation, memo } = req.body.Start;
+        const { lodging, PlanId } = req.body;
 
+        const { loginID } = req.session;
+
+        //base 수정
         await Plan.updateOne({
-            _user: loginID
+            _user: loginID,
+            _id: PlanId,
         }, {
             title,
             start,
             end
         });
 
-        res.json({result: true}).end();
-
-    },
-    //출발지 설정
-    editStartting : async (req, res) => {
-        const {id, address, time, transportation, memo} = req.body;
-
+        //start 수정
         await Starting.updateOne({
-            _id: id
+            _id: id,
         }, {
             addr: address,
-            time,
+            time: new Date(`${start} ${time}:00`),
             trans: transportation,
             memo
         });
 
-        res.json({result: true}).end();
-    },
-    //숙소 설정
-    //플랜 아이디 필요
-    editLodging : async (req, res) => {
-        const {loginID} = req.session;
-        const {Logding} = req.body;
+        //lodging 수정
+        let updateLog = [], createLog = [];
+        for (let { id, address, check_in, check_out, price, reservation, memo } of lodging) {
 
-
-        let updateLog = [];
-        await Logding.forEach(async ({id, address, check_in, check_out, price, reservation, memo}) => {
-            if(id === 0){
-                const lodging = await Lodging.create({
-                    addr : address,
+            if (!id) {
+                const lodgings = await Lodging.create({
+                    addr: address,
                     reser: reservation,
                     check_in,
                     check_out,
@@ -415,96 +425,99 @@ module.exports = {
                     memo
                 });
 
-                //플랜 아이디 필요
-                await Plan.updateOne({
-                    _id : 'planid',
-                    _user: loginID
-                },{
-                    $push : {
-                        lodging
-                    }
-                })
-                
-            }else{
-                await Lodging.updateOne({
+                createLog.push(lodgings._id);
+
+            } else {
+                const lodgingUp = await Lodging.updateOne({
                     _id: id
                 }, {
-                    addr : address,
+                    addr: address,
                     reser: reservation,
                     check_in,
                     check_out,
                     price,
                     memo
                 })
-                
+
                 updateLog.push(id);
             }
-        });
+        }
+
+        const lodgings = updateLog.concat(createLog);
 
         const deleteLodging = await Lodging.deleteMany({
-            _id : {
-                $nin : updateLog
-            }
+            _id: {
+                $nin: lodgings,
+            },
         })
 
         await Plan.updateOne({
-            _id : 'planid',
+            _id: PlanId,
             _user: loginID
-        },{
-            $pullAll : {
-                lodging : deleteLodging
-            }
+        }, {
+            $pull: {
+                lodging: {
+                    $nin: lodgings
+                }
+            },
         })
 
+        await Plan.updateOne({
+            _id: PlanId,
+            _user: loginID
+        }, {
+            $push: {
+                lodging: {
+                    $each: createLog,
+                }
+            }
+        });
 
-        res.json({result: true}).end();
+        const plan = await Plan.findOne({
+            _user: loginID,
+            _id: PlanId,
+        }).populate(['starting', 'lodging']);
 
+        res.json({ result: true, plan }).end();
 
     },
     //플랜 삭제
-    //플랜 아이디 필요
     deletePlan : async (req, res) => {
         const {loginID} = req.session;
-        //플랜 아이디를 준다고 가장한다.
-        //ex -> planID
+        const {PlanId} = req.body;
         
         await Plan.deleteOne({
-            _id: planID,
+            _id: PlanId,
             _user: loginID
         });
 
         await Starting.deleteOne({
-            _plan : planID
+            _plan : PlanId
         })
 
         await Lodging.deleteMany({
-            _plan : planID
+            _plan : PlanId
         })
 
         await Calendar.deleteMany({
-            _id : {
-                plan : planID
-            }
+            '_id.plan': PlanId
         })
         
         await Details.deleteMany({
-            _plan : planID
-
+            _plan : PlanId
         })
 
         res.json({result: true}).end();
-
-
     },
     //유저 삭제
     deleteUser : async (req, res) => {
         const {loginID} = req.session;
 
-        const plans = await Plan.deleteMany({
+        const plans = await Plan.find({
             _user : loginID
         })
 
-        await plans.forEach( async ({_id}) => {
+        for(let {_id} of plans){
             await Starting.deleteOne({
                 _plan : _id
             })
@@ -514,20 +527,23 @@ module.exports = {
             })
     
             await Calendar.deleteMany({
-                _id : {
-                    plan : _id
-                }
+                '_id.plan' : _id
             })
             
             await Details.deleteMany({
                 _plan : _id
-    
             })
-        });
+        }
+
+        await Plan.deleteMany({
+            _user : loginID
+        })
 
         await User.deleteOne({
             _id: loginID
         })
+
+        req.session.destroy();
 
         res.json({result: true}).end();
 
@@ -540,14 +556,14 @@ module.exports = {
         const plan = await Plan.findOne({
             _id: planID,
             _user: loginID
-        }).populate('starting', {
+        }).populate(['starting', {
             path: 'lodging',
             options: {
                 sort : {
                     'check_in' : 1
                 }
             }
-        });
+        }]);
 
         const days = await Calendar.find({
             _id : {

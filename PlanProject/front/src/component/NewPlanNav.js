@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
-import Styles from "../route/SetPlan.module.scss";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { PlanContext } from "../context/PlanContext";
+import Styles from "../route/NewPlan.module.scss";
 
 const NewPlanNav = () => {
 
   const navigate = useNavigate();
 
-  const { view, setView, dateArr } = useContext(ThemeContext);
+  const { navState, setNavState, plan } = useContext(PlanContext);
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -21,70 +21,76 @@ const NewPlanNav = () => {
     }
   }
   const navNextFnc = () => {
-    if (currentIndex < dateArr.length - 5) {
+    if (currentIndex < navState.dateArr.length - 5) {
       setCurrentIndex(currentIndex + 1);
     }
   }
 
   //날짜 클릭
-  const planMovekFnc = (step, idx) => {
-    setView(idx);
-    navigate(`dayplan/0/${step}`);
+  const planMovekFnc = (idx) => {
+    setNavState({
+      ...navState,
+      view: idx,
+    });
+    navigate(`dayplan/${plan.PID}/${idx}`);
   }
 
   useEffect(() => {
-    console.log(view);
-  }, [view]);
 
-  //현재 일정날짜에 따라 nav 위치 변경
-  // useEffect(() => {
-  //   if(typeof(viewCont) === 'number'){
+    console.log("nav : ",navState);
 
-  //     if(viewCont > 4 && viewCont > (currentIndex + 4)) {
-  //       setCurrentIndex(viewCont-4);
-  //     }else if(viewCont < 5 && viewCont < (currentIndex + 5)){
-  //       setCurrentIndex(0);
-  //     }
-  //   }
-
-  // }, [viewCont])
+    if(typeof(navState.view) === 'number'){
+      if(navState.view > 4 && navState.view > (currentIndex + 4)) {
+        setCurrentIndex(navState.view-4);
+      }else if(navState.view < 5 && navState.view < (currentIndex + 5)){
+        setCurrentIndex(0);
+      }
+    }
+  }, [navState.view]);
 
   return (
-    <>
-      <div className={Styles.prevBtn} onClick={navPrevFnc}>◀</div>
-      <div className={Styles.nextBtn} onClick={navNextFnc}>▶</div>
+    <div className={Styles.navWrap}>
+      {(typeof(navState.view) === 'number') && 
+        <>
+          <div className={Styles.prevBtn} onClick={navPrevFnc}>◀</div>
+          <div className={Styles.nextBtn} onClick={navNextFnc}>▶</div>
+        </>
+      }
+      
       <div className={Styles.navDiv}>
-        {(view === 'STEP1' || view === 'STEP2' || view === 'STEP3') ? (
+        {(navState.view === 'STEP1' || navState.view === 'STEP2' || navState.view === 'STEP3') ? (
           startNav.map((step, idx) => {
-            if (step === view) {
+            if (step === navState.view) {
               return (
-                <div key={idx} style={{ backgroundColor: 'lightgray' }}
-                  onClick={() => setView(step)}>
+                <div key={idx} style={{ backgroundColor: 'rgba(183, 182, 182, 0.5)' }}
+                  onClick={() => setNavState({...navState, view:step})}>
                   {step}
                 </div>
               );
             } else {
               return (
-                <div key={idx} onClick={() => setView(step)}>{step}</div>
+                <div key={idx} onClick={() => setNavState({...navState, view:step})}>
+                  {step}
+                </div>
               );
             }
           })
         ) : (
-          dateArr.map((date, idx) => {
-            if (view === idx) {
+          navState.dateArr.map((date, idx) => {
+            if (navState.view === idx) {
               return (
-                <div onClick={() => planMovekFnc(date, idx)} key={idx}
+                <div onClick={() => planMovekFnc(idx)} key={idx}
                   className={Styles.dayNavDiv}
                   style={{
                     transform: `translate(-${currentIndex * 100}%)`,
-                    backgroundColor: 'lightgray',
+                    backgroundColor: 'rgba(183, 182, 182, 0.5)',
                   }}>
                   {date}
                 </div>
               );
             } else {
               return (
-                <div onClick={() => planMovekFnc(date, idx)} key={idx}
+                <div onClick={() => planMovekFnc(idx)} key={idx}
                   className={Styles.dayNavDiv}
                   style={{
                     transform: `translate(-${currentIndex * 100}%)`,
@@ -95,15 +101,8 @@ const NewPlanNav = () => {
             }
           })
         )}
-        {/* 미리보기에서 최종완료 or 수정 선택*/}
-        {/* {(viewCont === "PlanView") && (
-          <>
-            <div onClick={() => setViewCont(0)}>계획수정</div>
-            <div onClick={() => setViewCont("Complete")}>최종완료</div>
-          </>
-        )}  */}
       </div>
-    </>
+    </div>
   );
 }
 export default NewPlanNav;

@@ -1,0 +1,73 @@
+@import "_setPlan";
+
+input[type='text'] {
+  border-radius: 5px;
+  margin: 0;
+  padding: 5px;
+  border: 0;
+  border-bottom: 1px solid gray;
+  color: black;
+  font-size: 12px;
+}
+
+input[type='button'] {
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0;
+  padding: 5px;
+  border: 0;
+  color: black;
+  font-size: 15px;
+}
+
+
+.container {
+  width: 1000px;
+  height: 550px;
+  border: 1px solid white;
+  border-radius: 20px;
+  position: relative;
+
+  //Nav영역 NewPlanNav
+  .navWrap {
+    border-bottom: 1px solid white;
+    .prevBtn {
+      position: absolute;
+      left: 0;
+      font-size: 30px;
+      z-index: 999;
+      color: white;
+    }
+
+    .nextBtn {
+      position: absolute;
+      right: 0;
+      font-size: 30px;
+      z-index: 999;
+      color: white;
+    }
+
+    .navDiv {
+      height: 100%;
+      display: flex;
+      flex: nowrap;
+      overflow: hidden;
+
+      div {
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        height: 50px;
+        min-width: 33.3333333%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.5s ease-in-out;
+      }
+
+      .dayNavDiv {
+        min-width: 20%;
+      }
+    }
+  }
+}

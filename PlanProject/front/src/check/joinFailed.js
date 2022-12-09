@@ -29,7 +29,7 @@ const JoinFailed = ({index}) => {
 
         setFailedStyle({left, top});
 
-    },[]);
+    },[index]);
 
     return (
         <div className={styled.joinFailed} style={failedStyle}>

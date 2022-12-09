@@ -16,6 +16,8 @@ import ViewPlan from "./route/ViewPlan";
 
 import PwdChange from "./pwdChange/PwdChange";
 import OnGeoOk from "./weather/weather";
+import MyPage from "./mypage/MyPage";
+import HomeImg from "./background/Home";
 
 function App() {
 
@@ -26,7 +28,6 @@ function App() {
   useEffect(() => {
     loginCkFnc();
     getWeather();
-    
   },[])
 
   const getWeather = async () => {
@@ -57,6 +58,7 @@ function App() {
       {backgroundFnc()}
       <div className="App">
         <BrowserRouter>
+        <HomeImg/>
           <Routes>
             <Route path="/" element={<Login/>}></Route>
             <Route path="/emailCerti" element={<EmailCk/>}></Route>
@@ -64,6 +66,7 @@ function App() {
 
 
             <Route path="/newplan/*" element={<NewPlan />}></Route>
+            <Route path="/mypage" element={<MyPage/>}></Route>
             
             <Route path="/viewplan" element={<ViewPlan/>}></Route>
 
