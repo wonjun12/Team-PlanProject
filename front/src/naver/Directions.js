@@ -1,5 +1,6 @@
+import React from "react";
 import axios from "axios";
-import { Map } from './NaverApi';
+import { CreateLineMap, Map } from './NaverApi';
 
 const setCenter = (start, end) => {
     
@@ -45,6 +46,8 @@ const Directions = async () => {
 
     const location = Map.points;
 
+    console.log('111111',location)
+
     const headers = {
             'X-NCP-APIGW-API-KEY-ID' : 'nubervggvr',
             'X-NCP-APIGW-API-KEY' : '2K1v9doyDIQSwrgdKq7TnCTR9RjOQmrqQUMZlZPO'
@@ -53,7 +56,7 @@ const Directions = async () => {
     const start = `${location[0].x}, ${location[0].y}`;
     const goal = `${location[location.length - 1].x}, ${location[location.length - 1].y}`
 
-    const waypoints = '';
+    let waypoints = '';
 
     for(let i = 1; i < (location.length - 1) ; i++){
         if(i > 1){
@@ -66,7 +69,7 @@ const Directions = async () => {
             start,
             goal,
             waypoints,
-            option: 'trafast'
+            
     }
 
     const url = ((location.length - 2) <= 5)? '/map-direction' : '/map-direction-15'
@@ -77,7 +80,7 @@ const Directions = async () => {
     });
 
     const point = setCenter(location[0], location[location.length - 1]);
-    const zoom = setZoom(res.data.route.trafast[0].summary.distance);
+    const zoom = setZoom(res.data.route.traoptimal[0].summary.distance);
 
     Map.map.setCenter(point);
     Map.map.setZoom(zoom);

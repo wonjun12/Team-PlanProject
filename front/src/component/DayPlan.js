@@ -3,15 +3,20 @@ import axios from "axios";
 import { PlanContext } from "../context/PlanContext";
 import Styles from "./DayPlan.module.scss";
 import { useNavigate, useParams } from "react-router-dom";
-import { SetMap, SearchMap } from '../naver/NaverApi';
+import { SetMap, SearchMap, CreateLineMap} from '../naver/NaverApi';
+import Directions from '../naver/Directions';
 
 const DayPlans = () => {
 
   const navigate = useNavigate();
 
+  const { navState, setNavState, plan, setBaseEditCk } = useContext(PlanContext);
+
+  // id : planID , day : day index
   const { id, day } = useParams();
 
-  const { navState, setNavState, plan, setBaseEditCk } = useContext(PlanContext);
+  // 일정 새로 만들기 or 수정하기 state
+  const [editCk, setEditCk] = useState(false);
 
   //일정 open index
   const [open, setOpen] = useState(0);
@@ -19,10 +24,13 @@ const DayPlans = () => {
   //상세 설정 CK
   const [detailCk, setDetailCk] = useState(false);
 
+  //시간 input Ref
   const hourRef = useRef();
   const minuteRef = useRef();
 
+  //하루 일정 state
   const [dayPlan, setDayPlan] = useState([{
+    id: "",
     order: false,
     address: "",
     location: "",
@@ -59,6 +67,7 @@ const DayPlans = () => {
   //일정 추가
   const dayPlanAddFnc = () => {
     const dayPlanObj = {
+      id: "",
       order: false,
       address: "",
       location: "",
@@ -77,6 +86,7 @@ const DayPlans = () => {
   //일정 초기화
   const dayPlanReset = () => {
     setDayPlan([{
+      id: "",
       order: false,
       address: "",
       location: "",
@@ -98,12 +108,12 @@ const DayPlans = () => {
     }
   }
 
-  // DB 저장
+  // 새로 만들기 Post
   const dayPlanPostFnc = async () => {
-    console.log('dayPlan', dayPlan);
+
     //dayPlan post
     const res = await axios.post(`/back/plan/${id}/planDays`, {
-      day: navState.view,
+      day,
       dayPlan,
       point: [],
       distance: [],
@@ -120,49 +130,72 @@ const DayPlans = () => {
           ...navState,
           view: navState.view + 1
         })
+        navigate(`/newplan/dayplan/${id}/${navState.view + 1}`);
       }
     }
+  }
+
+  //계획 수정 Post
+  const dayPlanEditPostFnc = async () => {
+    let i = 0;
+    // for(let {address} of dayPlan){
+    //   SearchMap(address, false, i++);
+    // }
+
+      const aa = await Directions();
+      console.log(aa);
+      CreateLineMap(aa.data.route.traoptimal[0].path);
   }
 
   //일자별 계획 GET
   const getDayPlan = async () => {
 
     const res = await axios.get(`/back/plan/${id}/planDays`, {
-      params: { day: navState.view },
+      params: { day },
     });
 
-    if (res.data.dayPlan.length > 0) {
-      //이미 작성한 계획이 있으면 state에 담기      
-      const { details } = res.data.dayPlan[0];
+    const details = res.data.dayPlan.details;
 
-      //console.log('backGet', res.data.dayPlan);
-      let planArr = [];
-      details.map((obj) => {
-        planArr.push({
-          order: obj.order,
-          address: obj.addr,
-          location: obj.location,
-          reservation: obj.reser,
-          price: obj.price,
-          time: obj.time,
-          memo: obj.memo,
+    //id까지 가져와서 복사 후 state 저장
+    let copyDayArr = [];
+    let copyDayPlan = {};
+    if (details?.length > 0) {
+
+      for (let i = 0; i < details.length; i++) {
+        copyDayPlan = {
+          id: details[i]._id,
+          order: details[i].order,
+          address: details[i].addr,
+          location: details[i].location,
+          reservation: details[i].reser,
+          price: details[i].price,
+          memo: details[i].memo,
+          reservation: details[i].reser,
+          price: details[i].price,
+          time: details[i].time,
+          memo: details[i].memo,
           lastLocation: "",
           lastAddress: "",
-        });
-      });
-
-      //마지막 날짜인 경우 last 정보를 0번째 배열에 넣는다
-      if (navState.view === navState.dateArr.length - 1) {
-        planArr[0].lastLocation = details[0].last.location;
-        planArr[0].lastAddress = details[0].last.addr;
+        }
+        copyDayArr.push(copyDayPlan);
       }
 
-      setDayPlan(planArr);
+      //마지막 날짜인 경우 last 정보를 0번째 배열에 넣는다
+      if (day === navState.dateArr.length - 1) {
+        copyDayArr[0].lastLocation = details[0].last.location;
+        copyDayArr[0].lastAddress = details[0].last.addr;
+      }
+
+      setDayPlan(copyDayArr);
+      setEditCk(true);
     } else {
       //처음 작성하는 계획이면 초기화
       dayPlanReset();
+      setEditCk(false);
     }
   }
+
+  console.log(dayPlan);
 
   const searchAddFnc = async (idx) => {
 
@@ -178,7 +211,7 @@ const DayPlans = () => {
   }
 
   const pageBackFnc = () => {
-    setNavState({...navState, view: 'STEP1'});
+    setNavState({ ...navState, view: 'STEP1' });
     setBaseEditCk(true);
     navigate('/newplan');
   }
@@ -307,7 +340,11 @@ const DayPlans = () => {
           );
         })}
         <input className={Styles.btn} type="button" value="일정추가" onClick={dayPlanAddFnc} />
-        <input className={Styles.btn} type="button" value="저장" onClick={dayPlanPostFnc} />
+        {editCk ? (
+          <input className={Styles.btn} type="button" value="수정완료" onClick={dayPlanEditPostFnc} />
+        ) : (
+          <input className={Styles.btn} type="button" value="저장" onClick={dayPlanPostFnc} />
+        )}
       </div>
     </div>
 

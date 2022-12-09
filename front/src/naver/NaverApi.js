@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { toPng } from 'html-to-image';
+import axios from "axios";
 
 
 const { naver } = window;
@@ -75,14 +76,9 @@ export const SearchMap = async (addr, isSearch, num) => {
                     Map.map.setZoom(13);
                     Map.map.setCenter(point);
                 }
-
-                return true;
-            } else {
-                Map.result = false;
             }
         });
     }
-    return Map.result;
 };
 
 export const CreateLineMap = (searchLine) => {

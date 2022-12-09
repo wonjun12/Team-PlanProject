@@ -51,9 +51,11 @@ const Lodging = () => {
 
   // 숙소 삭제
   const deleteFnc = (delIdx) => {
-    if (delIdx > 0) {
+    if (log.length > 1) {
       setLog(log.filter((_, idx) => idx !== delIdx));
-      setOpen(delIdx - 1);
+      if(delIdx > 0){
+        setOpen(delIdx - 1);  
+      }
     }
   }
 

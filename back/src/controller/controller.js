@@ -218,8 +218,8 @@ module.exports = {
 
         plan.save();
 
-        res.json({ 
-            reulst: true, 
+        res.json({
+            reulst: true,
             plan,
         }).end();
     },
@@ -262,7 +262,7 @@ module.exports = {
 
         calender.save();
 
-        res.json({ result: true }).end();
+        res.json({ result: true, calender }).end();
 
     },
     //내정보 계획표 목록 보기
@@ -279,7 +279,7 @@ module.exports = {
     viewPlanDay: async (req, res) => {
         const { id } = req.params;
         const { day } = req.query;
-        const dayPlan = await Calendar.find({
+        const dayPlan = await Calendar.findOne({
             '_id.day': day,
             '_id.plan': id
         }).populate([{
@@ -291,27 +291,28 @@ module.exports = {
             }
         }]);
 
+        //console.log(dayPlan);
+
         res.json({ result: true, dayPlan }).end();
     },
     //일자별 계획 수정
     //플랜아이디 필요함
     editDayPlan: async (req, res) => {
         const { id } = req.params;
-        const { dayPlan } = req.body;
+        const { dayPlan, day, point, distance, duration } = req.body;
 
         await Calendar.updateOne({
-            _id: {
-                day,
-                plan: id
-            }
+            '_id.day' : day,
+            '_id.plan' : id
         }, {
-
+            point,
+            distance,
+            duration
         })
 
-
-        let count = 0, updateDays = [];
+        let count = 0, updateDays = [], createDays = [];
         for (let { id, address, location, reservation, price, time, order, memo, lastLocation, lastAddress } of dayPlan) {
-            if (!!id) {
+            if (!id) {
                 const dayplan = await Details.create({
                     _plan: id,
                     addr: address,
@@ -328,17 +329,7 @@ module.exports = {
                     }
                 });
 
-                //플랜아이디 필요
-                await Calendar.updateOne({
-                    _id: {
-                        day,
-                        plan: id
-                    }
-                }, {
-                    $push: {
-                        details: dayplan
-                    }
-                })
+                createDays.push(dayPlan);
             } else {
                 await Details.updateOne({
                     _id: id
@@ -360,22 +351,37 @@ module.exports = {
             }
         }
 
-        const deleteDetails = await Details.deleteMany({
+        const daysArray = updateDays.concat(createDays);
+
+        await Details.deleteMany({
             _id: {
-                $nin: updateDays
+                $nin: daysArray
             }
         })
 
         await Calendar.updateOne({
-            _id: {
-                day,
-                plan: id
-            }
+            '_id.day' : day,
+            '_id.plan' : id
         }, {
-            $pullAll: {
-                details: deleteDetails
+            $pull: {
+                details: {
+                    $nin : daysArray
+                }
             }
         })
+
+        await Calendar.updateOne({
+            '_id.day' : day,
+            '_id.plan' : id
+        }, {
+            $push: {
+                details: {
+                    $each : createDays
+                }
+            }
+        }) 
+        
+        res.json({result: true}).end();
     },
     //타이틀 플랜 수정 //소진 수정
     editPlan: async (req, res) => {
@@ -406,13 +412,11 @@ module.exports = {
         });
 
         //lodging 수정
-        let updateLog = [];
+        let updateLog = [], createLog = [];
         for (let { id, address, check_in, check_out, price, reservation, memo } of lodging) {
-            console.log('price',price);
-            console.log('reservation',reservation);
-            console.log('reservation',typeof(reservation));
+
             if (!id) {
-                const lodging = await Lodging.create({
+                const lodgings = await Lodging.create({
                     addr: address,
                     reser: reservation,
                     check_in,
@@ -421,18 +425,10 @@ module.exports = {
                     memo
                 });
 
-                //플랜 아이디 필요
-                await Plan.updateOne({
-                    _id: PlanId,
-                    _user: loginID
-                }, {
-                    $push: {
-                        lodging
-                    }
-                })
+                createLog.push(lodgings._id);
 
             } else {
-                await Lodging.updateOne({
+                const lodgingUp = await Lodging.updateOne({
                     _id: id
                 }, {
                     addr: address,
@@ -447,25 +443,40 @@ module.exports = {
             }
         }
 
+        const lodgings = updateLog.concat(createLog);
+
         const deleteLodging = await Lodging.deleteMany({
             _id: {
-                $nin: updateLog
-            }
+                $nin: lodgings,
+            },
         })
 
         await Plan.updateOne({
             _id: PlanId,
             _user: loginID
         }, {
-            $pullAll: {
-                lodging: deleteLodging
-            }
+            $pull: {
+                lodging: {
+                    $nin: lodgings
+                }
+            },
         })
+
+        await Plan.updateOne({
+            _id: PlanId,
+            _user: loginID
+        }, {
+            $push: {
+                lodging: {
+                    $each: createLog,
+                }
+            }
+        });
 
         const plan = await Plan.findOne({
             _user: loginID,
             _id: PlanId,
-        })
+        }).populate(['starting', 'lodging']);
 
         res.json({ result: true, plan }).end();
 
@@ -490,7 +501,6 @@ module.exports = {
     editLodging: async (req, res) => {
         const { loginID } = req.session;
         const { lodging } = req.body;
-
 
         let updateLog = [];
 

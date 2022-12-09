@@ -15,21 +15,15 @@ const SetPlan = () => {
   //post 하기 전에 data 유효성 검사
   const [dataCk, setDataCk] = useState(true);
 
-  //날짜, 출발지, 숙소 새로만들기 Post
-  const newPlanPostFnc = async () => {
-    const res = await axios.post('/back/plan',{
-      SetPlan: plan.baseData,
-      Start: plan.startPlan,
-      lodging: plan.lodging,
-    });
-
+  //DB에 plan을 생성, 수정 하고 만들어진 id를 front obj에 저장
+  const saveID = (resPlan) => {
     //각각의 숙소 id를 가져오기 위해 복사
     let copyLodgingArr = [];
     let copyLodging = {};
-    if(res.data.plan.lodging.length > 0) {
-      for(let i = 0; i < res.data.plan.lodging.length; i++){
+    if(resPlan.lodging.length > 0) {
+      for(let i = 0; i < resPlan.lodging.length; i++){
         copyLodging = {
-          id: res.data.plan.lodging[i]._id,
+          id: resPlan.lodging[i]._id,
           address: plan.lodging[i].address,
           check_in: plan.lodging[i].check_in,
           check_out: plan.lodging[i].check_out,
@@ -44,16 +38,28 @@ const SetPlan = () => {
     //각각의 id를 State에 담는다
     setPlan({
       ...plan,
-      PID: res.data.plan._id,
+      PID: resPlan._id,
       startPlan: {
         ...plan.startPlan,
-        id: res.data.plan.starting._id,
+        id: resPlan.starting._id,
       },
       lodging: copyLodgingArr,
     });
+  }
+
+  //날짜, 출발지, 숙소 새로만들기 Post
+  const newPlanPostFnc = async () => {
+    const res = await axios.post('/back/plan',{
+      SetPlan: plan.baseData,
+      Start: plan.startPlan,
+      lodging: plan.lodging,
+    });
+
+    //ID 저장
+    saveID(res.data.plan);
 
     setNavState({...navState, view: 0});
-    navigate(`dayplan/${res.data.plan._id}/${navState.dateArr[0]}`);
+    navigate(`dayplan/${res.data.plan._id}/0`);
   }
 
   //날짜, 출발지, 숙소 수정하기 Post
@@ -64,11 +70,16 @@ const SetPlan = () => {
       Start: plan.startPlan,
       lodging: plan.lodging,
     });
-    console.log('editPost',res.data.paln);
+    console.log('editPost',res.data.plan);
 
-    // setNavState({...navState, view: 0});
-    // navigate(`dayplan/${plan.PID}/${navState.dateArr[0]}`);
+    //ID 저장
+    saveID(res.data.plan);
+
+    setNavState({...navState, view: 0});
+    navigate(`dayplan/${plan.PID}/0`);
   }
+
+  console.log(plan);
 
   //필수 정보 유효성 검사
   useEffect(() => {

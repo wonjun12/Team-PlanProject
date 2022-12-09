@@ -32,7 +32,7 @@ const NewPlanNav = () => {
       ...navState,
       view: idx,
     });
-    navigate(`dayplan/${plan.PID}/${navState.dateArr[navState.view]}`);
+    navigate(`dayplan/${plan.PID}/${idx}`);
   }
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const NewPlanNav = () => {
           navState.dateArr.map((date, idx) => {
             if (navState.view === idx) {
               return (
-                <div onClick={() => planMovekFnc(date, idx)} key={idx}
+                <div onClick={() => planMovekFnc(idx)} key={idx}
                   className={Styles.dayNavDiv}
                   style={{
                     transform: `translate(-${currentIndex * 100}%)`,
@@ -90,7 +90,7 @@ const NewPlanNav = () => {
               );
             } else {
               return (
-                <div onClick={() => planMovekFnc(date, idx)} key={idx}
+                <div onClick={() => planMovekFnc(idx)} key={idx}
                   className={Styles.dayNavDiv}
                   style={{
                     transform: `translate(-${currentIndex * 100}%)`,
