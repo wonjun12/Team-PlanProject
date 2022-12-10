@@ -4,6 +4,7 @@ import Join from "./Join";
 import  axiosPost  from "../Axios/backAxiosPost";
 import LoginFailed from "../check/loginFailed";
 import LoginCheck from "../check/loginCheck";
+import Loading from "../loading/Loading";
 
 const MainInput = (bool) => {
 
@@ -56,6 +57,7 @@ const MainInput = (bool) => {
 
     const toSelect = async (e) => {
         e.preventDefault();
+        setLoading(true);
         
         if(id === ''){
             setLoginFailed({fail: true, error:'email'});
@@ -69,10 +71,11 @@ const MainInput = (bool) => {
             setButtonDisable(true);
             changeAni(90);
             const {result, error} = await axiosPost('/home/login', loginData, '/select', waitTime);
+
+            setLoading(false);
             
             if(!result){
                 setTimeout(() => {
-                    console.log(error);
                     changeAni(0);
                     setLoginFailed({fail: !result, error: (error !== undefined)? error : ''});
                     setTimeout(() => {
@@ -81,9 +84,11 @@ const MainInput = (bool) => {
                 }, waitTime);
             }
         }
+        
     };
 
     const pwdSearch = async () => {
+        setLoading(true);
         const {result, error} = await axiosPost('/home/sendPwd',{email: id});
         
         if(!result){
@@ -92,14 +97,19 @@ const MainInput = (bool) => {
             setId('');
             setEmailPlace('이메일을 성공적으로 보냈습니다!!');
         }
+        setLoading(false);
     };
 
     useEffect(() => {
         LoginCheck();
     },[]);
 
+    const [loading, setLoading] = useState(false);
+
     return (
-        (joinChange)? <Join toLogin={toLogin} joinChangeBack={joinChangeBack}/> :
+        <>
+        {loading && <Loading/>}
+        {(joinChange)? <Join toLogin={toLogin} joinChangeBack={joinChangeBack}/> :
         <>
             {(loginFailed.fail)? <LoginFailed setFailed={setLoginFailed} err={loginFailed.error} /> : null}
             <form id="loginFormId" className={formChange? styled.loginForm : styled.loginFormBack} >
@@ -115,7 +125,8 @@ const MainInput = (bool) => {
                 
                 </div>
             </form>
-        </>
+        </>}
+    </>
     );
 }
 

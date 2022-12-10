@@ -20,10 +20,6 @@ const mongoose = require('mongoose'),
         trans: String,
         memo: String,
         count: Number,
-        order: {
-            type: Boolean,
-            require: true
-        },
         last : {
             addr : String,
             location : String

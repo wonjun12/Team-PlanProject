@@ -1,15 +1,204 @@
 @mixin responsive($step) {
 
-  @if $step == 'startDiv' {
-    //STEP1 
+  @if $step == 'settingDiv'{
     
   }
-  @if $step == 'lodgingDiv' {
+  @if $step == 'startDiv' {
+    //STEP1 
+    p{
+      display: flex;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .planDiv{
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      label{
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      input,select,textarea{
+        font-size: 20px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      button{
+        font-size: 20px;
+      }
+    }
+  }
+  @if $step == 'logdingDiv' {
     //STEP2
-    
+    overflow-y: auto;
+    .logdingDiv{
+
+      label{
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      input,select,textarea{
+        font-size: 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+      }
+
+      .openDiv{
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+        p{
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+        }
+        .openSpan{
+          position: absolute;
+          font-size: 40px;
+          top: -10px;
+          right: 0;
+        }
+      }
+      border: 1px solid;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      .logDateDiv{
+        display: flex;
+        height: 40px;
+        .dateText{
+          font-size: 30px;
+          display: flex;
+          align-items: center;
+          margin: 0 50px;
+        }
+      }
+      .logdingInfoDiv{
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        .priceLabel{
+          margin-left: 150px;
+          margin-right: 10px;
+        }
+        input[type='checkbox']{
+          margin: 0;
+          margin-right: 10px;
+          width: 30px;
+          height: 30px;
+        }
+        input[type='number']{
+          margin: 0;
+          width: 200px;
+        }
+      }
+      .deleteBtn{
+        width: 100px;
+        align-self: flex-end;
+      }
+    }
   }
   @if $step == 'dayPlanDiv' { 
     //일별 일정
-    
+    overflow-y: auto;
+    .planDiv{
+      label{
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input, textarea{
+        font-size: 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: 100%;
+      }
+      input[type='checkbox'], input[type='radio']{
+        width: 20px;
+        height: 20px;
+      }
+      .openDiv{
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+        p{
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+        }
+        .openSpan{
+          position: absolute;
+          font-size: 40px;
+          top: -10px;
+          right: 0;
+        }
+      }
+      border: 1px solid;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+
+      .orderDiv{
+        width: 100%;
+        margin-bottom: 5px;
+        label{
+          margin-right: 150px;
+        }
+      }
+      .locationDiv{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        .timeDiv{
+          display: flex;
+          input{
+            width: 150px;
+          }
+        }
+      }
+
+      .detailBtnDiv{
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 10px;
+        p{
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+        }
+        span{
+          position: absolute;
+          font-size: 40px;
+          top: -10px;
+          right: 0;
+        }
+      }
+
+      .detailDiv{
+        display: flex;
+        width: 100%;
+        label{
+          margin-right: 50px;
+        }
+        input[type='number']{
+          width: 250px;
+        }
+      }
+      .deleteBtn{
+        width: 100px;
+        align-self: flex-end;
+      }
+    }
   }
 }

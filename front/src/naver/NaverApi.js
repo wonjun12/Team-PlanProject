@@ -1,14 +1,12 @@
 import { useEffect, useRef } from "react";
 import { toPng } from 'html-to-image';
-import axios from "axios";
 
 
 const { naver } = window;
 export const Map = {
     map: null,
-    makers: [],
-    points: [],
-    result: false,
+    makers: null,
+    line: null,
 };
 
 export const SetMap = () => {
@@ -44,19 +42,16 @@ export const SetMap = () => {
     );
 };
 
-export const SearchMap = async (addr, isSearch, num) => {
-
-    if (!!Map.makers[num]) {
-        Map.makers[num].setMap(null);
+export const SearchMap = async(addr) => {
+    if (!!Map.makers) {
+        Map.makers.setMap(null);
     }
 
-    if (addr !== '' && addr !== undefined) {
-        await naver.maps.Service.geocode({
+    return new Promise((resolve, reject) => {
+        naver.maps.Service.geocode({
             query: addr
         }, (stat, res) => {
-
             if (stat !== naver.maps.Service.Status.ERROR && res.v2.meta.totalCount !== 0) {
-                Map.result = true;
                 const item = res.v2.addresses[0];
                 const point = new naver.maps.Point(item.x, item.y);
 
@@ -64,24 +59,48 @@ export const SearchMap = async (addr, isSearch, num) => {
                     position: new naver.maps.LatLng(point),
                     map: Map.map
                 });
-                if (!!Map.makers[num]) {
-                    Map.makers[num] = marker;
-                    Map.points[num] = point;
-                } else {
-                    Map.makers.push(marker);
-                    Map.points.push(point);
-                }
 
-                if (isSearch) {
-                    Map.map.setZoom(13);
-                    Map.map.setCenter(point);
-                }
+                Map.makers = marker;
+                Map.map.setCenter(point);
+                Map.map.setZoom(13);
+
+                resolve(true)
+
+            } else {
+                reject(false)
             }
         });
-    }
+    })
 };
 
+export const PullSearchMap = (addr) => {
+    return new Promise((resolve, reject) => {
+
+        naver.maps.Service.geocode({
+            query: addr
+        }, (stat, res) => {
+
+            if (stat !== naver.maps.Service.Status.ERROR && res.v2.meta.totalCount !== 0) {
+                const item = res.v2.addresses[0];
+                const point = new naver.maps.Point(item.x, item.y);
+
+                resolve(point)
+
+            } else {
+
+                reject(false)
+
+            }
+        });
+    })
+}
+
 export const CreateLineMap = (searchLine) => {
+
+    if (!!Map.line) {
+        Map.line.setMap(null);
+    }
+
     const polyLine = new naver.maps.Polyline({
         map: Map.map,
         path: searchLine,
@@ -89,6 +108,8 @@ export const CreateLineMap = (searchLine) => {
         strokeOpacity: 1,
         strokeWeight: 5
     });
+
+    Map.line = polyLine;
 };
 
 export const MapCapture = async (DivRef) => {

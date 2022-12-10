@@ -7,7 +7,7 @@ import { PlanContext } from "../context/PlanContext";
 
 const SetDate = () => {
 
-  const { navState, setNavState, plan, setPlan } = useContext(PlanContext);
+  const { navState, setNavState, plan, setPlan, baseEditCk } = useContext(PlanContext);
 
   //여행 기본 정보
   const [base, setBase] = useState({
@@ -34,7 +34,7 @@ const SetDate = () => {
 
     //요일 숫자로 넘기기
     // const dayStr = ["일","월","화","수","목","금","토"];
-    // return `${yyyy}-${mm}-${dd}-${dayStr[day]}`;
+    // return `${mm}-${dd}-${dayStr[day]}`;
   }
 
   //일자 계산
@@ -56,25 +56,10 @@ const SetDate = () => {
     setDateCK(false);
   }
 
-  //날짜 설정
-  const setDate = () => {
-    let arr = [];
-    let date = new Date(base.start);
-    for (let i = 0; i < parseInt(base.days); i++) {
-      const dateStr = getDate(date);
-      arr.push(
-        dateStr
-      );
-      date.setDate(date.getDate() + 1);
-    }
-    console.log(arr);
-    setNavState({...navState, dateArr: arr});
-  }
-
   //기본 정보 설정 완료
   const setDatePostFnc = () => {
 
-    console.log('setDate', base);
+    //console.log('setDate', base);
     
     //기본 정보 set
     setPlan({
@@ -92,7 +77,7 @@ const SetDate = () => {
       );
       date.setDate(date.getDate() + 1);
     }
-    console.log(arr);
+    arr.push('PlanView');
     setNavState({view: 'STEP2', dateArr: arr});
 
   }
@@ -119,12 +104,12 @@ const SetDate = () => {
         <input id="title" type="text" value={base.title} 
           onChange={(e) => setBase({...base, title: e.target.value})} />
         <div className={Styles.textDiv}>
-          <p>START : {base.start}</p>
-          <p>END : {base.end}</p>
+          <p>START* : {base.start}</p>
+          <p>END* : {base.end}</p>
           {(base.days !== 0 && base.days !== "") && 
             <p>{base.days - 1}박 {base.days}일</p>}
 
-          <input type="button" value="저장" disabled={dateCK} onClick={setDatePostFnc}/>
+          <input type="button" value="다음" disabled={dateCK} onClick={setDatePostFnc}/>
         </div>
       </div>
     </div>

@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Styles from "./Lodging.module.scss";
-import { SetMap, SearchMap } from '../naver/NaverApi';
+import { SetMap, SearchMap, PullSearchMap, CreateLineMap, Map } from '../naver/NaverApi';
+import Directions from "../naver/Directions";
 import { PlanContext } from "../context/PlanContext";
 
 const Lodging = () => {
 
-  const { plan, setPlan } = useContext(PlanContext);
+  const { plan, setPlan, setLoading } = useContext(PlanContext);
 
   //숙소 open index
   const [open, setOpen] = useState(0);
@@ -53,38 +54,80 @@ const Lodging = () => {
   const deleteFnc = (delIdx) => {
     if (log.length > 1) {
       setLog(log.filter((_, idx) => idx !== delIdx));
-      if(delIdx > 0){
-        setOpen(delIdx - 1);  
+      if (delIdx > 0) {
+        setOpen(delIdx - 1);
       }
     }
   }
 
-  // 저장
-  const hotelPostFnc = () => {
-    console.log('log', log);
-    setPlan({
-      ...plan,
-      lodging: log,
-    })
+  // 완료 버튼 > 주소 유효성 + 지도 경로 + 전역변수에 저장
+  const hotelPostFnc = async () => {
+
+    setLoading(true);
+    let pointArr = []
+    let i = 0; // 잘 못 입력된 주소 idx
+    try {
+      for (let { address } of log) {
+        const point = await PullSearchMap(address);
+        pointArr.push(point);
+        i++;
+      }
+
+      if (log?.length > 1) {
+        const data = await Directions(pointArr);
+        CreateLineMap(data.path);
+      }
+
+      setPlan({
+        ...plan,
+        lodging: log,
+      })
+
+      setLoading(false);
+
+    } catch (error) {
+
+      setLoading(false);
+      alert('주소를 다시 검색해주세요');
+      let copy = [...log];
+      copy[i] = {
+        ...copy[i],
+        address: "",
+      }
+      setLog(copy);
+      setOpen(i);
+
+      return;
+    }
+
   }
 
   // 지도 검색 
   const searchAddFnc = async (idx) => {
 
-    const searchCK = await SearchMap(log[idx].address, true);
-    if (!searchCK) {
+    let result = false;
+    try {
+      result = await SearchMap(log[idx].address);
+    } catch (error) {
+      result = false;
+    }
+    if (!result) {
       let copy = [...log];
-      copy[idx] = {
-        ...copy[idx],
-        address: "",
-      }
-      setLog(copy);
+      copy[idx].address = ""
+      setLog(copy)
       alert('주소를 다시 검색해주세요');
     }
   }
 
   useEffect(() => {
     setLog(plan.lodging);
+    //주소 값이 있으면 지도 표시
+    try {
+      if (plan.lodging[0].address !== '') {
+        SearchMap(plan.lodging[0].address);
+      }
+    } catch (error) {
+    }
   }, []);
 
   return (
@@ -106,15 +149,15 @@ const Lodging = () => {
                 <>
                   <div className={Styles.addDiv}>
                     <label>
-                      주소<br />
-                      <input type="text" value={obj.address} 
-                        onChange={(e) => valueChangeFnc(e, "address", idx, obj)}/>
+                      주소*<br />
+                      <input type="text" value={obj.address}
+                        onChange={(e) => valueChangeFnc(e, "address", idx, obj)} />
                     </label>
                     <input type="button" value="검색" onClick={() => searchAddFnc(idx)} />
                   </div>
 
                   <label>
-                    숙박일정
+                    숙박일정*
                     <div className={Styles.logDateDiv}>
                       <input type="date"
                         value={obj.check_in}
@@ -154,7 +197,7 @@ const Lodging = () => {
           )
         })}
         <input className={Styles.btn} type="button" value="숙소추가" onClick={hotelAddFnc} />
-        <input className={Styles.btn} type="button" value="저장" onClick={hotelPostFnc} />
+        <input className={Styles.btn} type="button" value="완료" onClick={hotelPostFnc} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-const { emailSignMail, pwdChangeMail } = require('../mail/mailer');
+const {emailSignMail, pwdChangeMail} = require('../mail/mailer');
 const bcrypt = require('bcrypt');
 const User = require('../db/user');
 const Plan = require('../db/plan');
@@ -20,134 +20,134 @@ const userPasswordChange = async (_id, password) => {
 module.exports = {
     //로그인 체크
     loginCk: async (req, res) => {
-        const { loginBool } = req.session;
+        const {loginBool} = req.session;
 
-        if (loginBool) {
-            res.json({ result: true }).end();
-        } else {
-            res.json({ result: false }).end();
+        if(loginBool){
+            res.json({result: true}).end();
+        }else{
+            res.json({result: false}).end();
         }
     },
     //회원 이메일 체크 and 이메일 인증 체크
     joinEmailCk: async (req, res) => {
-        const { email } = req.body;
-        const user = await User.exists({ email });
+        const {email} = req.body;
+        const user = await User.exists({email});
 
-        if (user === null) {
-            res.json({ result: true }).end();
-        } else {
-            res.json({ result: false }).end();
+        if(user === null){
+            res.json({result: true}).end();
+        }else{
+            res.json({result: false}).end();
         }
     },
     //이메일 인증 적용 및 확인
     emailCerti: async (req, res) => {
         try {
-            const { email } = req.body;
+            const {email} = req.body;
 
             const user = await User.findOneAndUpdate({
-                email,
-                emailCk: false
-            }, {
+                email, 
+                emailCk:false
+            },{
                 emailCk: true
             });
 
-            if (user === null) {
-                res.json({ result: false }).end();
-            } else {
-                res.json({ result: true }).end();
+            if(user === null){
+                res.json({result:false}).end();
+            }else {
+                res.json({result: true}).end();
             }
         } catch (error) {
-            res.json({ result: false }).end();
+            res.json({result:false}).end();
         }
-
+        
     },
     //비밀번호 찾기 이메일 보내기
     sendPwd: async (req, res) => {
-        const { email } = req.body;
+        const {email} = req.body;
 
         try {
-            const user = await User.findOne({ email });
+            const user = await User.findOne({email});
 
-            if (user === null) {
-                res.json({ result: false, error: '이메일을 정확히 입력 후 눌러주세요!!' }).end();
-            } else {
+            if(user === null){
+                res.json({result:false, error: '이메일을 정확히 입력 후 눌러주세요!!'}).end();
+            }else {
                 pwdChangeMail(user._id, user.password, email)
-                res.json({ result: true }).end();
+                res.json({result:true}).end();
             }
         } catch (error) {
-            res.json({ result: false, error: '이메일을 정확히 입력 후 눌러주세요!!' }).end();
+            res.json({result:false, error: '이메일을 정확히 입력 후 눌러주세요!!'}).end();
         }
     },
     //이메일 인증 유저 비밀번호 변경
     pwdChange: async (req, res) => {
-        const { id, hash, password } = req.body;
-
+        const {id, hash, password} = req.body;
+        
         try {
-            const user = await User.findById({ _id: id });
+            const user = await User.findById({_id:id});
 
-            if (user !== null && hash === user.password) {
+            if(user !== null && hash === user.password){
                 await userPasswordChange(id, password);
 
-                res.json({ result: true }).end();
-            } else {
-                res.json({ result: false }).end();
+                res.json({result:true}).end();
+            }else{
+                res.json({result:false}).end();
             }
         } catch (error) {
-            res.json({ result: false }).end();
+            res.json({result:false}).end();
         }
     },
     //유저 비밀번호 변경
     userPwdChange: async (req, res) => {
-        const { loginID } = req.session;
-        const { hash, password } = req.body;
+        const {loginID} = req.session;
+        const {hash, password} = req.body;
 
 
         try {
 
-            const user = await User.findById({ _id: loginID });
+            const user = await User.findById({_id: loginID});
             const bool = await bcrypt.compare(hash, user.password);
 
-            if (bool) {
+            if(bool){
                 await userPasswordChange(user._id, password);
 
-                res.json({ result: true }).end();
-            } else {
-                res.json({ result: false }).end();
+                res.json({result:true}).end();
+            }else{
+                res.json({result:false}).end();
             }
         } catch {
-            res.json({ result: false }).end();
+            res.json({result:false}).end();
         }
 
     },
     //로그인
     login: async (req, res) => {
-        const { email, password } = req.body;
+        const {email, password} = req.body;
 
         const user = await User.findOne({
             email
         });
 
-        if (user !== null) {
+        if(user !== null){
             const PwdCheck = await bcrypt.compare(password, user.password);
-            if (!PwdCheck) {
-                res.json({ result: false }).end();
-            } else {
-                if (user.emailCk) {
+            if(!PwdCheck){
+                res.json({result: false}).end();
+            }else {
+                if(user.emailCk){
                     req.session.loginBool = true;
                     req.session.loginID = user._id;
-                    res.json({ result: true }).end();
-                } else {
-                    res.json({ result: true, error: 'emailCerti', email }).end();
+                    res.json({result: true}).end();
+                }else{
+                    res.json({result: true, error:'emailCerti', email}).end();
                 }
             }
-        } else {
-            res.json({ result: false, error: '존재하지 않는 이메일 입니다!!' }).end();
+        }else {
+            res.json({result: false, error: '존재하지 않는 이메일 입니다!!'}).end();
         }
 
     },
     //회원가입
     join: async (req, res) => {
-        const { email, name, password } = req.body;
+        const {email, name, password} = req.body;
         const timeOut = 1000 * 60 * 60;
 
         await User.create({
@@ -155,24 +155,29 @@ module.exports = {
             name,
             password
         });
-
+        
         //1시간 후 인증되어 있지 않다면 삭제
         setTimeout(async () => {
-            const user = await User.findOne({ email });
-            if (!(user.emailCk)) {
-                await User.deleteOne({ email: user.email });
-            }
-        }, timeOut);
+            try{
+                const user = await User.findOne({email});
+                if(!(user.emailCk)){
+                    await User.deleteOne({email:user.email});
+                }
+            }catch{
 
+            }
+            
+        }, timeOut);
+        
         //이메일 전송
         emailSignMail(email);
 
-        res.json({ result: true, error: 'emailCerti', email }).end();
+        res.json({result: true, error:'emailCerti', email}).end();
     },
     //로그아웃
     logout: async (req, res) => {
         req.session.destroy();
-        res.json({ result: true }).end();
+        res.json({result: true}).end();
     },
     //계획표 작성
     //출발지 및 숙소 설정
@@ -225,12 +230,12 @@ module.exports = {
     },
     //일자 별로 계획 설정
     setDayPlan: async (req, res) => {
-        const { id } = req.params;
+        const {id} = req.params;
         // const {loginID} = req.session;
-        const { dayPlan, day, point, distance, duration } = req.body;
+        const {dayPlan, day, point, distance, duration} = req.body;
 
         const calender = await Calendar.create({
-            _id: {
+            _id : {
                 day,
                 plan: id
             },
@@ -240,7 +245,7 @@ module.exports = {
         });
 
         let count = 0;
-        for (let { address, location, reservation, price, time, order, memo, lastLocation, lastAddress } of dayPlan) {
+        for(let {address, location, reservation, price, time, memo, lastLocation, lastAddress} of dayPlan){
             const dayplan = await Details.create({
                 _plan: id,
                 addr: address,
@@ -250,53 +255,50 @@ module.exports = {
                 time,
                 memo,
                 count: count++,
-                order,
-                last: {
-                    addr: lastAddress,
-                    location: lastLocation
+                last : {
+                    addr : lastAddress,
+                    location : lastLocation
                 }
             });
-
+            
             calender.details.push(dayplan);
         }
 
         calender.save();
 
-        res.json({ result: true, calender }).end();
+        res.json({result: true}).end();
 
     },
     //내정보 계획표 목록 보기
     myPlan: async (req, res) => {
-        //소진 수정
-        const { loginID } = req.session;
-        const plans = await Plan.find({
-            _user: loginID,
-        }).populate(['starting', 'lodging']).sort({ 'created_at': -1 });
+        const {loginID} = req.session;
 
-        res.json({ result: true, plans }).end();
+        const plans = await Plan.find({
+            _user: loginID
+        }).sort({'created_at' : -1});
+        
+        res.json({result : true, plans}).end();
     },
     //작성한 계획표 일자별 보기
     viewPlanDay: async (req, res) => {
-        const { id } = req.params;
-        const { day } = req.query;
-        const dayPlan = await Calendar.findOne({
-            '_id.day': day,
-            '_id.plan': id
-        }).populate([{
+        const {id} = req.params;
+        const {day} = req.query;
+
+        const dayPlan = await Calendar.find({
+            '_id.day' : day,
+            '_id.plan' : id
+        }).populate({
             path: 'details',
             options: {
-                sort: {
-                    'count': 1
+                sort : {
+                    'count' : 1
                 }
             }
-        }]);
+        });
 
-        //console.log(dayPlan);
-
-        res.json({ result: true, dayPlan }).end();
+        res.json({result: true, dayPlan}).end();
     },
     //일자별 계획 수정
-    //플랜아이디 필요함
     editDayPlan: async (req, res) => {
         const { id } = req.params;
         const { dayPlan, day, point, distance, duration } = req.body;
@@ -311,7 +313,7 @@ module.exports = {
         })
 
         let count = 0, updateDays = [], createDays = [];
-        for (let { id, address, location, reservation, price, time, order, memo, lastLocation, lastAddress } of dayPlan) {
+        for (let { id, address, location, reservation, price, time, memo, lastLocation, lastAddress } of dayPlan) {
             if (!id) {
                 const dayplan = await Details.create({
                     _plan: id,
@@ -322,7 +324,6 @@ module.exports = {
                     time,
                     memo,
                     count: count++,
-                    order,
                     last: {
                         addr: lastAddress,
                         location: lastLocation
@@ -341,7 +342,6 @@ module.exports = {
                     time,
                     memo,
                     count: count++,
-                    order,
                     last: {
                         addr: lastAddress,
                         location: lastLocation
@@ -383,7 +383,7 @@ module.exports = {
         
         res.json({result: true}).end();
     },
-    //타이틀 플랜 수정 //소진 수정
+    //타이틀 플랜 수정
     editPlan: async (req, res) => {
         const { title, start, end } = req.body.SetPlan;
         const { id, address, time, transportation, memo } = req.body.Start;
@@ -481,189 +481,106 @@ module.exports = {
         res.json({ result: true, plan }).end();
 
     },
-    //출발지 설정
-    editStartting: async (req, res) => {
-        const { id, address, time, transportation, memo } = req.body;
-
-        await Starting.updateOne({
-            _id: id
-        }, {
-            addr: address,
-            time,
-            trans: transportation,
-            memo
-        });
-
-        res.json({ result: true }).end();
-    },
-    //숙소 설정
-    //플랜 아이디 필요
-    editLodging: async (req, res) => {
-        const { loginID } = req.session;
-        const { lodging } = req.body;
-
-        let updateLog = [];
-
-        for (let { id, address, check_in, check_out, price, reservation, memo } of lodging) {
-            if (!!id) {
-                const lodging = await Lodging.create({
-                    addr: address,
-                    reser: reservation,
-                    check_in,
-                    check_out,
-                    price,
-                    memo
-                });
-
-                //플랜 아이디 필요
-                await Plan.updateOne({
-                    _id: 'planid',
-                    _user: loginID
-                }, {
-                    $push: {
-                        lodging
-                    }
-                })
-
-            } else {
-                await Lodging.updateOne({
-                    _id: id
-                }, {
-                    addr: address,
-                    reser: reservation,
-                    check_in,
-                    check_out,
-                    price,
-                    memo
-                })
-
-                updateLog.push(id);
-            }
-        }
-
-        const deleteLodging = await Lodging.deleteMany({
-            _id: {
-                $nin: updateLog
-            }
-        })
-
-        await Plan.updateOne({
-            _id: 'planid',
-            _user: loginID
-        }, {
-            $pullAll: {
-                lodging: deleteLodging
-            }
-        })
-
-
-        res.json({ result: true }).end();
-
-
-    },
     //플랜 삭제
-    //플랜 아이디 필요
-    deletePlan: async (req, res) => {
-        const { loginID } = req.session;
-        //플랜 아이디를 준다고 가장한다.
-        //ex -> planID
-
+    deletePlan : async (req, res) => {
+        const {loginID} = req.session;
+        const {PlanId} = req.body;
+        
         await Plan.deleteOne({
-            _id: planID,
+            _id: PlanId,
             _user: loginID
         });
 
         await Starting.deleteOne({
-            _plan: planID
+            _plan : PlanId
         })
 
         await Lodging.deleteMany({
-            _plan: planID
+            _plan : PlanId
         })
 
         await Calendar.deleteMany({
-            _id: {
-                plan: planID
-            }
+            '_id.plan': PlanId
         })
-
+        
         await Details.deleteMany({
-            _plan: planID
-
+            _plan : PlanId
         })
 
-        res.json({ result: true }).end();
-
-
+        res.json({result: true}).end();
     },
     //유저 삭제
-    deleteUser: async (req, res) => {
-        const { loginID } = req.session;
+    deleteUser : async (req, res) => {
+        const {loginID} = req.session;
 
-        const plans = await Plan.deleteMany({
-            _user: loginID
+        const plans = await Plan.find({
+            _user : loginID
         })
 
-        await plans.forEach(async ({ _id }) => {
+        for(let {_id} of plans){
             await Starting.deleteOne({
-                _plan: _id
+                _plan : _id
             })
-
+    
             await Lodging.deleteMany({
-                _plan: _id
+                _plan : _id
             })
-
+    
             await Calendar.deleteMany({
-                _id: {
-                    plan: _id
-                }
+                '_id.plan' : _id
             })
-
+            
             await Details.deleteMany({
-                _plan: _id
-
+                _plan : _id
             })
-        });
+        }
+
+        await Plan.deleteMany({
+            _user : loginID
+        })
 
         await User.deleteOne({
             _id: loginID
         })
 
-        res.json({ result: true }).end();
+        req.session.destroy();
+
+        res.json({result: true}).end();
 
     },
     //계획한 계획표 전체적으로 보기
     //플랜 아이디 필요 (planID)
-    overallPlan: async (req, res) => {
-        const { loginID } = req.session;
+    overallPlan : async (req, res) => {
+
+        const {loginID} = req.session;
+        const {id} = req.params;
 
         const plan = await Plan.findOne({
-            _id: planID,
+            _id: id,
             _user: loginID
         }).populate(['starting', {
             path: 'lodging',
             options: {
-                sort: {
-                    'check_in': 1
+                sort : {
+                    'check_in' : 1
                 }
             }
         }]);
 
+        //소진 수정
         const days = await Calendar.find({
-            _id: {
-                plan: plan._id
-            }
+            '_id.plan' : id
         }).populate({
             path: 'details',
             options: {
-                sort: {
-                    'count': 1
+                sort : {
+                    'count' : 1
                 }
             }
         })
-        res.json({ result: true, plan, days }).end();
+        res.json({result: true, plan, days}).end();    
 
     },
 
-
+    
 }

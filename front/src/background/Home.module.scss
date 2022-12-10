@@ -1,0 +1,15 @@
+.homeDiv{
+    position: absolute;
+    top: 0.5%;
+    left: 0.5%;
+    img{
+        width: 120px;
+        height: 120px;
+    }
+
+    transition: transform 0.5s;
+
+    &:hover{
+        transform: scale(1.4);
+    }
+}

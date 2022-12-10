@@ -13,9 +13,9 @@ const CalendarSchema = new mongoose.Schema({
             ref: 'Plan'
         }
     },
-    point: Array, //좌표 path
-    distance: Array, //거리
-    duration: Array, //시간
+    point: Array, //좌표
+    distance: Number, //거리
+    duration: Number, //시간
     details: [{
         type: Types.ObjectId,
         ref: 'Details'

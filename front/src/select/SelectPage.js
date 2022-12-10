@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {useNavigate} from 'react-router-dom'
 import styled from "./selectPage.module.scss";
 import loginCheck from "../check/loginCheck";
 import axiosPost from "../Axios/backAxiosPost";
+import Loading from "../loading/Loading";
 
 const SelectPage = () => {
 
@@ -32,6 +33,14 @@ const SelectPage = () => {
         changeAni();
         setTimeout(() => {
             navigate('/newplan');
+        },3100)
+    }
+
+    const toMypage = () => {
+        setButtonDisable(true);
+        changeAni();
+        setTimeout(() => {
+            navigate('/mypage');
         },3100)
     }
 
@@ -65,7 +74,9 @@ const SelectPage = () => {
 
     const passwordChange = async (e) => {
         e.preventDefault();
+        
         if(!!password.pwd && !!password.hashPwd && !!password.pwdCk && !passwordError.pwdError && !passwordError.pwdCkError){
+            setLoading(true);
             const body = {
                 hash : password.hashPwd,
                 password : password.pwd
@@ -78,24 +89,52 @@ const SelectPage = () => {
             }else{
                 alert('잘못된 비밀번호를 입력하셧습니다.')
             }
+            setLoading(false);
 
         }else{
             alert('비밀번호를 확인하세요')
         }
     }
 
+
+    const pwdRef = useRef();
+
+    const passwordView = () => {
+        pwdRef.current.animate([
+            {
+                height : '0px'
+            },{
+                height : '200px'
+            }
+        ], 320)
+    }
+
+    useEffect(() => {
+        if(pwdChangDiv){
+            passwordView();
+        }
+    }, [pwdChangDiv])
+
+    const deleteUser = async () => {
+        setLoading(true);
+        await axiosPost('/user/deleteUser',{}, '/');
+    }
+
+    const [loading, setLoading] = useState(false);
+
     return(
         <>
+            {loading && <Loading/>}
             <div id="selectedId" className={styled.selectDiv}>
                 <div>
                     <button onClick={setPlan} disabled={buttonDisable}> 계획표 작성 </button>
-                    <button disabled={buttonDisable}> 나의 계획표 </button>
+                    <button onClick={toMypage} disabled={buttonDisable}> 나의 계획표 </button>
                     <button disabled={buttonDisable} onClick={() => setPwdChangeDiv(true)}> 비밀번호 변경 </button>
                 </div>
             </div>
             { (pwdChangDiv)?
-            <form className={styled.pwdDiv}> 
-                <div>
+            <form  className={styled.pwdDiv}> 
+                <div ref={pwdRef}>
                     <input value={password.hashPwd} onChange={(e) => {
                         const hashPwd = e.target.value;
                         setPassword({...password, hashPwd});
@@ -107,7 +146,7 @@ const SelectPage = () => {
                     <div>
                         <button type="button" onClick={() => setPwdChangeDiv(false)}> 취소 </button>
                         <button onClick={passwordChange}> 비밀번호 변경 </button>
-                        <button type="button"> 회원 탈퇴 </button>
+                        <button onClick={deleteUser} type="button"> 회원 탈퇴 </button>
                     </div>
                 </div>
             </form>: 
