@@ -96,7 +96,7 @@ const EditPlan = () => {
     const end = plan.end.split('T');
 
     const time = Math.abs(new Date(plan.start).getTime() - new Date(plan.end).getTime());
-    const days = Math.ceil(time / (1000*60*60*24))+1;
+    const days = Math.ceil(time / (1000*60*60*24)) + 1;
 
     const stTime = new Date(plan.starting.time);
     let hh = stTime.getHours();

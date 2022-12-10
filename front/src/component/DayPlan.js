@@ -150,7 +150,7 @@ const DayPlans = () => {
             ...navState,
             view: navState.view + 1
           })
-          navigate(`/newplan/dayplan/${id}/${navState.view + 1}`);
+          navigate(`/newplan/${id}/${navState.view + 1}`);
         }
       }
       setLoading(false);
@@ -205,7 +205,7 @@ const DayPlans = () => {
           ...navState,
           view: navState.view + 1
         })
-        navigate(`/newplan/dayplan/${id}/${navState.view + 1}`);
+        navigate(`/newplan/${id}/${navState.view + 1}`);
       }
 
     } catch (error) {
