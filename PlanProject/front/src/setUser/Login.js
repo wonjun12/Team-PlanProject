@@ -71,9 +71,7 @@ const MainInput = (bool) => {
             setButtonDisable(true);
             changeAni(90);
             const {result, error} = await axiosPost('/home/login', loginData, '/select', waitTime);
-
-            setLoading(false);
-            
+  
             if(!result){
                 setTimeout(() => {
                     changeAni(0);
@@ -84,6 +82,8 @@ const MainInput = (bool) => {
                 }, waitTime);
             }
         }
+
+        setLoading(false);
         
     };
 

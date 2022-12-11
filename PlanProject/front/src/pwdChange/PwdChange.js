@@ -78,7 +78,7 @@ const PwdChange = () => {
                 <div>
                     {pwdCkError}
                 </div>
-            <button type="submit" onClick={pwdChange}> 비밀번호를 변경하실려면 클릭하세요! </button>
+            <button type="submit" onClick={pwdChange}> 비밀번호를 변경</button>
         </form>  : 
         
         <div className={styled.pwdChangeDiv} style={{color:'red', fontSize:'25px'}}>

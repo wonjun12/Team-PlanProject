@@ -25,7 +25,8 @@ const MyPage = () => {
     }
 
     const onDragEnd = () => {
-        const maxWidth =  (1300 - pageDiv.current.offsetWidth);
+        const maxWidth =  (plans.length < 4)? 0 : (1300 - pageDiv.current.offsetWidth);
+                
         setIsDrag(false);
         
         if(moveDiv > 0){
@@ -50,7 +51,7 @@ const MyPage = () => {
     const setDate = (day) => {
         const weeks = ['일', '월', '화', '수', '목', '금', '토']
         const days = new Date(day);
-        return `${days.getFullYear()}-${days.getMonth()}-${days.getDay()} (${weeks[days.getDay()]})`
+        return `${days.getFullYear()}-${days.getMonth() + 1}-${days.getDate()} (${weeks[days.getDay()]})`
     }
 
     const getPlan = async () => {
@@ -107,7 +108,7 @@ const MyPage = () => {
                                 <span onClick={() => {deletePlan(_id)}}> 
                                     삭제 
                                 </span>
-                                <button onClick={() => toHref(`./${_id}`)}>
+                                <button onClick={() => toHref(`/viewplan/${_id}`)}>
                                     보기
                                 </button>
                             </div>

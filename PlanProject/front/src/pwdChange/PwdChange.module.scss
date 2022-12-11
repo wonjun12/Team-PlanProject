@@ -50,10 +50,11 @@
         right: 4%;
         bottom: 3%;
         border-radius: 10px;
-        border: 1px solid #2b2c2e;
-        background-color: rgba(0,0,0,0);
+        font-size: 18px;
+        border: none;
+        transition: transform 0.4s;
         &:hover{
-            color: #edccf7;
+            transform: scale(1.1);
         }
     }
 }

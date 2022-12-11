@@ -7,7 +7,7 @@ const JoinFailed = ({index}) => {
     const [content, setContent] = useState('');
 
     useEffect(() => {
-        const left = 30 + '%';
+        const left = 20 + '%';
         let top;
         if(index === 1){
             top = 37 + '%';

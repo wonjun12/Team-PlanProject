@@ -13,6 +13,7 @@ import EmailCk from "./check/EmailCk";
 
 import NewPlan from "./route/NewPlan";
 import ViewPlan from "./route/ViewPlan";
+import EditPlan from "./route/EditPlan";
 
 import PwdChange from "./pwdChange/PwdChange";
 import OnGeoOk from "./weather/weather";
@@ -42,9 +43,9 @@ function App() {
   }
 
   const backgroundFnc = () => {
-    if(weather === 'rain'){
+    if(weather === 'Rain'){
       return <Rain/>
-    }else if(weather === 'snow') {
+    }else if(weather === 'Snow') {
       return <Snow/>
     }else {
       return <Sun/>
@@ -66,9 +67,12 @@ function App() {
 
 
             <Route path="/newplan/*" element={<NewPlan />}></Route>
+
+            <Route path="/editplan/:id/*" element={<EditPlan />}></Route>
+
             <Route path="/mypage" element={<MyPage/>}></Route>
             
-            <Route path="/viewplan" element={<ViewPlan/>}></Route>
+            <Route path="/viewplan/:id" element={<ViewPlan/>}></Route>
 
             <Route path="/password" element={<PwdChange/>}></Route>
 

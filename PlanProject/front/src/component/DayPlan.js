@@ -3,16 +3,19 @@ import axios from "axios";
 import { PlanContext } from "../context/PlanContext";
 import Styles from "./DayPlan.module.scss";
 import { useNavigate, useParams } from "react-router-dom";
-import { SetMap, SearchMap, CreateLineMap} from '../naver/NaverApi';
+import { SetMap, SearchMap, CreateLineMap, PullSearchMap } from '../naver/NaverApi';
 import Directions from '../naver/Directions';
 
 const DayPlans = () => {
 
   const navigate = useNavigate();
 
-  const { navState, setNavState, plan, setBaseEditCk } = useContext(PlanContext);
+  const { navState, setNavState, plan, setBaseEditCk, setLoading } = useContext(PlanContext);
 
-  // id : planID , day : day index
+  //지도 초기화 state
+  const [ismap, setIsmap] = useState(false);
+
+  // id : planID
   const { id, day } = useParams();
 
   // 일정 새로 만들기 or 수정하기 state
@@ -28,10 +31,12 @@ const DayPlans = () => {
   const hourRef = useRef();
   const minuteRef = useRef();
 
+  //숙소 정보 불러오기 select Ref
+  const selectRef = useRef();
+
   //하루 일정 state
   const [dayPlan, setDayPlan] = useState([{
     id: "",
-    order: false,
     address: "",
     location: "",
     reservation: false,
@@ -41,6 +46,12 @@ const DayPlans = () => {
     lastLocation: "",
     lastAddress: ""
   }]);
+
+  const [distanceInfo, setDistanceInfo] = useState({
+    path: [],
+    distance: 0,
+    duration: 0,
+  })
 
   //onchange 함수
   const inputChangeFnc = (e, key, idx) => {
@@ -59,7 +70,7 @@ const DayPlans = () => {
 
     copy[idx] = {
       ...copy[idx],
-      [key]: key === 'order' ? !copy[idx].order : changeValue,
+      [key]: changeValue,
     }
     setDayPlan(copy);
   }
@@ -68,7 +79,6 @@ const DayPlans = () => {
   const dayPlanAddFnc = () => {
     const dayPlanObj = {
       id: "",
-      order: false,
       address: "",
       location: "",
       reservation: false,
@@ -87,7 +97,6 @@ const DayPlans = () => {
   const dayPlanReset = () => {
     setDayPlan([{
       id: "",
-      order: false,
       address: "",
       location: "",
       reservation: false,
@@ -111,73 +120,137 @@ const DayPlans = () => {
   // 새로 만들기 Post
   const dayPlanPostFnc = async () => {
 
-    //dayPlan post
-    const res = await axios.post(`/back/plan/${id}/planDays`, {
-      day,
-      dayPlan,
-      point: [],
-      distance: [],
-      duration: []
-    });
-
-    //저장 후 페이지 이동
-    if (res.data.result) {
-      setOpen(0);
-      if (navState.view >= navState.dateArr.length - 1) {
-        //setView("PlanView");
-      } else {
-        setNavState({
-          ...navState,
-          view: navState.view + 1
-        })
-        navigate(`/newplan/dayplan/${id}/${navState.view + 1}`);
+    let pointArr = []
+    let i = 0; // 잘 못 입력된 주소 idx
+    try {
+      setLoading(true);
+      for (let { address } of dayPlan) {
+        //좌표 가져오기
+        const point = await PullSearchMap(address);
+        pointArr.push(point);
+        i++;
       }
+      //전체 경로 정보 가져오기
+      const data = await Directions(pointArr);
+      console.log(data);
+      if (data.path?.length > 0) {
+        const res = await axios.post(`/back/plan/${id}/planDays`, {
+          day,
+          dayPlan,
+          point: data.path,
+          distance: data.distance,
+          duration: data.duration
+        });
+
+        //저장 후 페이지 이동
+        //현재 계획 날짜가 마지막 날짜면 저장만 하고 이동 안함
+        setOpen(0);
+        
+        if (navState.view < navState.dateArr.length - 2) {
+          setNavState({
+            ...navState,
+            view: navState.view + 1
+          })
+          navigate(`/newplan/${id}/${navState.view + 1}`);
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      // 주소 검색에 실패 했을 경우
+      setLoading(false);
+      alert('주소를 다시 검색해주세요');
+      let copy = [...dayPlan];
+      copy[i] = {
+        ...copy[i],
+        address: "",
+      }
+      //잘못 입력된 주소를 리셋하고 해당 계획을 열어줌
+      setDayPlan(copy);
+      setOpen(i);
+      return;
     }
   }
 
   //계획 수정 Post
   const dayPlanEditPostFnc = async () => {
-    let i = 0;
-    // for(let {address} of dayPlan){
-    //   SearchMap(address, false, i++);
-    // }
 
-      const aa = await Directions();
-      console.log(aa);
-      CreateLineMap(aa.data.route.traoptimal[0].path);
+    let pointArr = []
+    let i = 0; // 잘 못 입력된 주소 idx
+    try {
+      setLoading(true);
+      for (let { address } of dayPlan) {
+        //좌표 가져오기
+        const point = await PullSearchMap(address);
+        pointArr.push(point);
+        i++;
+      }
+      //전체 경로 정보 가져오기
+      const data = await Directions(pointArr);
+
+      if (data.path?.length > 0) {
+        await axios.post(`/back/plan/${id}/editDay`, {
+          day,
+          dayPlan,
+          point: data.path,
+          distance: data.distance,
+          duration: data.duration
+        });
+      }
+      setLoading(false);
+
+      //저장 후 페이지 이동
+      //현재 계획 날짜가 마지막 날짜면 저장만 하고 이동 안함
+      setOpen(0);
+      if (navState.view < navState.dateArr.length - 2) {
+        setNavState({
+          ...navState,
+          view: navState.view + 1
+        })
+        navigate(`/newplan/${id}/${navState.view + 1}`);
+      }
+
+    } catch (error) {
+      // 주소 검색에 실패 했을 경우
+      setLoading(false);
+      alert('주소를 다시 검색해주세요');
+      let copy = [...dayPlan];
+      copy[i] = {
+        ...copy[i],
+        address: "",
+      }
+      //잘못 입력된 주소를 리셋하고 해당 계획을 열어줌
+      setDayPlan(copy);
+      setOpen(i);
+      return;
+    }
   }
 
   //일자별 계획 GET
   const getDayPlan = async () => {
 
+    setLoading(true);
     setIsmap(false)
-
     const res = await axios.get(`/back/plan/${id}/planDays`, {
       params: { day },
     });
+    setIsmap(true);
 
-    setIsmap(true)
-
-    const details = res.data.dayPlan.details;
+    console.log('get', res.data);
 
     //id까지 가져와서 복사 후 state 저장
+    const details = res.data.dayPlan?.details;
     let copyDayArr = [];
     let copyDayPlan = {};
     if (details?.length > 0) {
-
       for (let i = 0; i < details.length; i++) {
         copyDayPlan = {
           id: details[i]._id,
-          order: details[i].order,
           address: details[i].addr,
           location: details[i].location,
           reservation: details[i].reser,
           price: details[i].price,
           memo: details[i].memo,
-          reservation: details[i].reser,
-          price: details[i].price,
           time: details[i].time,
-          memo: details[i].memo,
           lastLocation: "",
           lastAddress: "",
         }
@@ -185,67 +258,198 @@ const DayPlans = () => {
       }
 
       //마지막 날짜인 경우 last 정보를 0번째 배열에 넣는다
-      if (day === navState.dateArr.length - 1) {
-        copyDayArr[0].lastLocation = details[0].last.location;
-        copyDayArr[0].lastAddress = details[0].last.addr;
+      if (parseInt(day) === navState.dateArr.length - 2) {
+        copyDayArr[0].lastLocation = details[0].last?.location;
+        copyDayArr[0].lastAddress = details[0].last?.addr;
       }
 
+      setDistanceInfo({
+        path: res.data.point,
+        distance: res.data.dayPlan[0]?.distance,
+        duration: res.data.dayPlan[0]?.duration,
+      });
+
+      setLoading(false);
       setDayPlan(copyDayArr);
       setEditCk(true);
+      setDetailCk(false);
+      //첫번째 일정 지도 표시
+      try {
+        await SearchMap(details[0].addr);
+      } catch (error) {
+      }
     } else {
       //처음 작성하는 계획이면 초기화
+      setDistanceInfo({
+        path: [],
+        distance: 0,
+        duration: 0,
+      });
+      setLoading(false);
       dayPlanReset();
       setEditCk(false);
+      setDetailCk(false);
     }
   }
 
-  console.log(dayPlan);
-
+  //주소 검색
   const searchAddFnc = async (idx) => {
 
-    const searchCK = await SearchMap(dayPlan[idx].address, true);
-    if (!searchCK) {
+    let result = false;
+
+    try {
+      result = await SearchMap(dayPlan[idx].address);
+    } catch (error) {
+      result = false;
+    }
+
+    if (!result) {
       let copy = [...dayPlan];
       copy[idx] = {
         ...copy[idx],
         address: "",
       }
       setDayPlan(copy);
+      alert('주소를 다시 검색해주세요');
     }
   }
 
+  //초기 설정 수정으로 돌아가기
   const pageBackFnc = () => {
     setNavState({ ...navState, view: 'STEP1' });
     setBaseEditCk(true);
     navigate('/newplan');
   }
 
+  //출발지, 숙소 정보 불러오기
+  const getLocInfoFnc = (idx) => {
+    if (selectRef.current.value !== 'none') {
+      let copy = [...dayPlan];
+      if (selectRef.current.value === 'start') {
+        //출발지 선택
+        copy[idx] = {
+          ...copy[idx],
+          address: plan.startPlan.address,
+          location: `출발지`,
+          reservation: false,
+        }
+      } else {
+        //숙소 선택
+        let locIdx = parseInt(selectRef.current.value);
+        copy[idx] = {
+          ...copy[idx],
+          address: plan.lodging[locIdx].address,
+          location: `${locIdx + 1}번째 숙소`,
+          reservation: plan.lodging[locIdx].reservation,
+          memo: plan.lodging[locIdx].memo,
+        }
+      }
+
+      setDayPlan(copy);
+    }
+  }
+
+  //전체 경로 지도 출력 
+  const directionFnc = async () => {
+
+    let pointArr = []
+    let i = 0; // 잘 못 입력된 주소 idx
+    try {
+      setLoading(true);
+      for (let { address } of dayPlan) {
+        //좌표 가져오기
+        const point = await PullSearchMap(address);
+        pointArr.push(point);
+        i++;
+      }
+
+      //마지막 날짜인 경우 last 좌표를 마지막 배열에 넣는다
+      if (parseInt(day) === navState.dateArr.length - 2) {
+        i = -1;
+        const point = await PullSearchMap(dayPlan[0].lastAddress);
+        pointArr.push(point);
+        i = 0;
+      }
+
+      //전체 경로 정보 가져오기
+      const data = await Directions(pointArr);
+
+      //경로 정보 state에 담기
+      setDistanceInfo({
+        path: data.path,
+        distance: data.distance,
+        duration: data.duration,
+      });
+
+      //전체 경로 Line 그리기
+      await CreateLineMap(data.path);
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      alert('주소를 다시 검색해주세요');
+
+      if (i === -1) {
+        //last 주소 검색에 실패 했을 경우
+        let copy = [...dayPlan];
+        copy[0] = {
+          ...copy[0],
+          lastAddress: "",
+        }
+        //잘못 입력된 주소를 리셋하고 해당 계획을 열어줌
+        setDayPlan(copy);
+        setOpen(0);
+      } else {
+        //일정 주소 검색에 실패 했을 경우
+        let copy = [...dayPlan];
+        copy[i] = {
+          ...copy[i],
+          address: "",
+        }
+        //잘못 입력된 주소를 리셋하고 해당 계획을 열어줌
+        setDayPlan(copy);
+        setOpen(i);
+      }
+
+      return;
+    }
+  }
+
   useEffect(() => {
     //dayPlan get
     getDayPlan();
-  }, [navState.view])
-
-  const [ismap, setIsmap] = useState(false)
+    setOpen(0);
+  }, [day])
 
   return (
     <div className={Styles.dayPlanWrap}>
       <div className={Styles.mapDiv}>
         {ismap && <SetMap />}
+        <div className={Styles.distanceDiv}>
+          <p>거리 : {Math.round(distanceInfo.distance / 1000)}km</p>
+          {(((distanceInfo.duration / 60000) / 60) >= 1) ? (
+            <p>시간 : {Math.floor((distanceInfo.duration / 60000) / 60)}시간 {Math.ceil((distanceInfo.duration / 60000) % 60)}분</p>
+          ) : (
+            <p>시간 : {Math.floor((distanceInfo.duration / 60000))}분</p>
+          )}
+
+        </div>
       </div>
       <div className={Styles.dayPlanDiv}>
-        <input type="button" value="뒤로가기(초기세팅수정)" onClick={pageBackFnc} />
-        {(navState.view === navState.dateArr.length - 1) && (
+        {(navState.view === navState.dateArr.length - 2) && (
           <div className={Styles.lastLocDiv}>
             <label>최종 도착지 이름<br />
               <input type="text" value={dayPlan[0].lastLocation}
                 onChange={(e) => inputChangeFnc(e, "lastLocation", 0)}
               />
             </label>
-            <label>최종 도착지 주소<br />
-              <input type="text" value={dayPlan[0].lastAddress}
+            <label htmlFor="last">최종 도착지 주소*</label>
+            <div className={Styles.lastAddDiv}>
+              <input id='last' type="text" value={dayPlan[0].lastAddress}
                 onChange={(e) => inputChangeFnc(e, "lastAddress", 0)}
               />
-            </label>
+              <input type="button" value="검색" onClick={() => searchAddFnc()} />
+            </div>
           </div>
         )}
         {dayPlan.map((obj, idx) => {
@@ -262,21 +466,19 @@ const DayPlans = () => {
               </div>
               {(open === idx) &&
                 <>
-                  <div className={Styles.orderDiv}>
-                    <label>
-                      <input type="radio" checked={!obj.order} value={false} name="order"
-                        onChange={(e) => inputChangeFnc(e, "order", idx)} />
-                      숙소 도착 전 일정
-                    </label>
-                    <label>
-                      <input type="radio" checked={obj.order} value={true} name="order"
-                        onChange={(e) => inputChangeFnc(e, "order", idx)} />
-                      숙소 도착 후 일정
-                    </label>
+                  <div className={Styles.logSelectDiv}>
+                    <select ref={selectRef}>
+                      <option value="none" selected>출발지 or 숙소 선택 </option>
+                      <option value='start'>출발지</option>
+                      {plan.lodging.map((_, index) => {
+                        return <option key={index} value={index}>{index + 1}번째 숙소</option>
+                      })}
+                    </select>
+                    <input type="button" value="주소 불러오기" onClick={() => getLocInfoFnc(idx)} />
                   </div>
 
                   <div className={Styles.addDiv}>
-                    <label htmlFor="address">주소</label>
+                    <label htmlFor="address">주소*</label>
                     <div className={Styles.addInputDiv}>
                       <input id="address" type="text" value={obj.address}
                         onChange={(e) => inputChangeFnc(e, "address", idx)}
@@ -346,14 +548,17 @@ const DayPlans = () => {
           );
         })}
         <input className={Styles.btn} type="button" value="일정추가" onClick={dayPlanAddFnc} />
+        <input className={Styles.btn} type="button" value="경로보기" onClick={directionFnc} />
         {editCk ? (
           <input className={Styles.btn} type="button" value="수정완료" onClick={dayPlanEditPostFnc} />
         ) : (
-          <input className={Styles.btn} type="button" value="저장" onClick={dayPlanPostFnc} />
+          <input className={Styles.btn} type="button"
+            value={(navState.view === navState.dateArr.length - 2) ? "저장" : "다음"}
+            onClick={dayPlanPostFnc} />
         )}
+        <input className={Styles.btn} type="button" value="뒤로가기" onClick={pageBackFnc} />
       </div>
     </div>
-
   );
 }
 

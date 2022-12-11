@@ -260,11 +260,11 @@ module.exports = {
                     location : lastLocation
                 }
             });
-            
             calender.details.push(dayplan);
         }
 
         calender.save();
+
 
         res.json({result: true}).end();
 
@@ -275,7 +275,7 @@ module.exports = {
 
         const plans = await Plan.find({
             _user: loginID
-        }).sort({'created_at' : -1});
+        }).sort({'createdAt' : -1});
         
         res.json({result : true, plans}).end();
     },
@@ -284,7 +284,7 @@ module.exports = {
         const {id} = req.params;
         const {day} = req.query;
 
-        const dayPlan = await Calendar.find({
+        const dayPlan = await Calendar.findOne({
             '_id.day' : day,
             '_id.plan' : id
         }).populate({
@@ -549,12 +549,13 @@ module.exports = {
 
     },
     //계획한 계획표 전체적으로 보기
-    //플랜 아이디 필요 (planID)
     overallPlan : async (req, res) => {
         const {loginID} = req.session;
 
+        const {id} = req.params;
+
         const plan = await Plan.findOne({
-            _id: planID,
+            _id: id,
             _user: loginID
         }).populate(['starting', {
             path: 'lodging',
@@ -566,9 +567,7 @@ module.exports = {
         }]);
 
         const days = await Calendar.find({
-            _id : {
-                plan : plan._id
-            }
+            '_id.plan' : id
         }).populate({
             path: 'details',
             options: {

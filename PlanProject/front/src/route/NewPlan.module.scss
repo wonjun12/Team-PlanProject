@@ -52,13 +52,14 @@ input[type='button'] {
       display: flex;
       flex: nowrap;
       overflow: hidden;
+      cursor: pointer;
 
       div {
         font-size: 20px;
         font-weight: bold;
         color: white;
         height: 50px;
-        min-width: 33.3333333%;
+        min-width: 25%;
         display: flex;
         align-items: center;
         justify-content: center;
