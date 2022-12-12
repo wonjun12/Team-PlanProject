@@ -25,7 +25,6 @@ function App() {
   const [weather, setWeather] = useState('');
   const [loginCk, setLoginCk] = useState(false);
 
-
   useEffect(() => {
     loginCkFnc();
     getWeather();

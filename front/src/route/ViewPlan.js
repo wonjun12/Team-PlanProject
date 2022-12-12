@@ -80,7 +80,7 @@ const ViewPlan = () => {
 
     if (res.data.days?.length > 0) {
       //지도 경로 출력
-      CreateLineMap(res.data.days[navState.view].point);
+      CreateLineMap(res.data.days[navState.view]?.point);
     }
     setLoading(false);
     setDayPlan(dayArr);
@@ -114,8 +114,14 @@ const ViewPlan = () => {
     }
   }
   const navNextFnc = () => {
-    if (currentIndex < navState.dateArr.length - 4) {
+    if (currentIndex < navState.dateArr.length - 5) {
       setCurrentIndex(currentIndex + 1);
+    }
+  }
+
+  const moveNextFnc = () => {
+    if(navState.view !== navState.dateArr.length-1){
+      setNavState({...navState, view: navState.view+1});
     }
   }
 
@@ -125,6 +131,13 @@ const ViewPlan = () => {
 
     //지도 경로 출력
     CreateLineMap(dayPlan[navState.view]?.point);
+
+    if (navState.view > 4 && navState.view > (currentIndex + 4)) {
+      setCurrentIndex(navState.view - 4);
+    } else if (navState.view < 5 && navState.view <= (currentIndex + 5)) {
+      setCurrentIndex(0);
+    }
+
   }, [navState.view])
 
   useEffect(() => {
@@ -161,14 +174,11 @@ const ViewPlan = () => {
               );
             }
           })}
-          <div onClick={() => { pdfDown.douwnloadPDF(pdfRef, '계획표 다운로드') }}
-            style={{ transform: `translate(-${currentIndex * 100}%)` }}>
-            PDF Print ▷
-          </div>
         </div>
 
         <div className={Styles.titleDiv}>
           <h2>{plan.title}</h2>
+          <input type='button' value='PDF Print' onClick={() => { pdfDown.douwnloadPDF(pdfRef, '계획표 다운로드') }} />
         </div>
 
         <div className={Styles.dayPlanWrap}>
@@ -217,10 +227,15 @@ const ViewPlan = () => {
                         <h3>{obj.location}</h3>
                         <p>{obj.addr}</p>
                       </div>
-                      {idx > 0 && (
+                      {idx > 0 ? (
                         <div className={Styles.timeDiv}>
                           <h3>활동 시간</h3>
                           <p>{hour}시간 {minute}분</p>
+                        </div>
+                      ) : (
+                        <div className={Styles.timeDiv}>
+                          <h3>출발 시간</h3>
+                          <p>{hour}시 {minute}분</p>
                         </div>
                       )}
                       <div className={Styles.detailBtnDiv}>
@@ -249,6 +264,8 @@ const ViewPlan = () => {
             <div className={Styles.editBtnDiv}>
               <input className={Styles.editBtn} type='button' value='수정하기'
                 onClick={() => window.location.href = `/editplan/${id}`} />
+              <input className={Styles.editBtn} type='button' value='다음'
+                onClick={moveNextFnc} />
             </div>
           </div>
         </div>

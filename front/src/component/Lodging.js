@@ -91,9 +91,8 @@ const Lodging = () => {
     setLoading(true);
     try {
       if (log?.length > 1) {
-
         const data = await getPath(log);
-        CreateLineMap(data.path);
+        //CreateLineMap(data.path);
       } else {
         const result = SearchMap(log[0].address);
       }
@@ -102,8 +101,8 @@ const Lodging = () => {
         ...plan,
         lodging: log,
       });
+      setNavState('DayPlan');
       setLoading(false);
-
     } catch (error) {
       setLoading(false);
       Swal.fire({
@@ -141,12 +140,7 @@ const Lodging = () => {
     setLoading(true);
     try {
       if (editCk) {
-        if (plan.lodging.length < 2) {
-          await SearchMap(plan.lodging[0].address);
-        } else {
-          const data = await getPath(plan.lodging);
-          CreateLineMap(data.path);
-        }
+        const result = await SearchMap(plan.lodging[0].address);
       }
     } catch (error) {
     }
@@ -226,7 +220,7 @@ const Lodging = () => {
           )
         })}
         <input className={Styles.btn} type="button" value="숙소추가" onClick={hotelAddFnc} />
-        <input className={Styles.btn} type="button" value="완료" onClick={hotelPostFnc} />
+        <input className={Styles.btn} type="button" value="다음" onClick={hotelPostFnc} />
       </div>
     </div>
   );

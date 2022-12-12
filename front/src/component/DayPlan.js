@@ -175,8 +175,9 @@ const DayPlans = () => {
         }else{
           navigate(`/newplan/${id}/${navState + 1}`);  
         }
+      }else if(navState === dateArr.length - 1){
+        window.location.href = `/viewplan/${id}`;
       }
-
     }
   }
 
@@ -203,8 +204,9 @@ const DayPlans = () => {
         }else{
           navigate(`/newplan/${id}/${navState + 1}`);  
         }
+      }else if(navState === dateArr.length - 1){
+        window.location.href = `/viewplan/${id}`;
       }
-
     }
   }
   //일자별 계획 GET
@@ -279,7 +281,8 @@ const DayPlans = () => {
   const searchAddFnc = async (idx) => {
     let result = false;
     try {
-      result = await SearchMap(dayPlan[idx].address);
+      const addr = (idx < 0) ? dayPlan[0].lastAddress : dayPlan[idx].address; 
+      result = await SearchMap(addr);
     } catch (error) {
       result = false;
     }
@@ -309,11 +312,20 @@ const DayPlans = () => {
       let copy = [...dayPlan];
       if (selectRef.current.value === 'start') {
         //출발지 선택
+        const timeArr = plan.startPlan.time.split(':');
+        const hh = parseInt(timeArr[0])*60;
+        const mm = parseInt(timeArr[1]);
+        hourRef.current.value = hh;
+        minuteRef.current.value = mm;
+        const time = hh+mm;
+        console.log(time);
         copy[idx] = {
           ...copy[idx],
           address: plan.startPlan.address,
           location: `출발지`,
+          time,
           reservation: false,
+          memo: plan.startPlan.memo,
         }
       } else {
         //숙소 선택
@@ -382,7 +394,7 @@ const DayPlans = () => {
               <input id='last' type="text" value={dayPlan[0].lastAddress}
                 onChange={(e) => inputChangeFnc(e, "lastAddress", 0)}
               />
-              <input type="button" value="검색" onClick={() => searchAddFnc()} />
+              <input type="button" value="검색" onClick={() => searchAddFnc(-1)} />
             </div>
           </div>
         )}
@@ -432,13 +444,26 @@ const DayPlans = () => {
                         onChange={(e) => inputChangeFnc(e, "location", idx)}
                       />
                     </label>
-                    {idx > 0 && (
+                    {idx > 0 ? (
                       <div className={Styles.timeDiv}>
                         <label>활동 시간<br />
                           <input type="number" value={hour}
                             step='1' min='0' max='12' ref={hourRef}
                             onChange={(e) => inputChangeFnc(e, "time", idx)}
                           />시간
+                          <input type="number" value={minute}
+                            step='10' min='0' max='59' ref={minuteRef}
+                            onChange={(e) => inputChangeFnc(e, "time", idx)}
+                          />분
+                        </label>
+                      </div>
+                    ) : (
+                      <div className={Styles.timeDiv}>
+                        <label>출발 시간<br />
+                          <input type="number" value={hour}
+                            step='1' min='0' max='24' ref={hourRef}
+                            onChange={(e) => inputChangeFnc(e, "time", idx)}
+                          />시
                           <input type="number" value={minute}
                             step='10' min='0' max='59' ref={minuteRef}
                             onChange={(e) => inputChangeFnc(e, "time", idx)}

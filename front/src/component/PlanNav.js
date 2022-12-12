@@ -7,7 +7,7 @@ import { DayContext } from "./SetDayPlan";
 
 export const StartNav = () => {
 
-  const { navState, setNavState } = useContext(StartContext);
+  const { navState, setNavState, editCk } = useContext(StartContext);
 
   //nav 항목
   const startNav = ["STEP1", "STEP2", "STEP3", "DayPlan"];

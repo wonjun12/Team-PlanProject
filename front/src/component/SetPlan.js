@@ -185,9 +185,9 @@ const SetPlan = ({ editCk, setLoading, loading }) => {
           title: '오류',
           text: '필수 입력란을 다시 입력해주세요',
         })
+        setNavState('STEP1');
       }
     }
-    console.log('plan', plan);
   }, [navState])
 
   return (

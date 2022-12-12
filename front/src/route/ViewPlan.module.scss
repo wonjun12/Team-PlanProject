@@ -116,6 +116,11 @@
       font-size: 18px;
       margin: 8px 0;
     }
+    input[type='button']{
+      position: absolute;
+      top: 6px;
+      right: 6px;
+    }
   }
 
   .dayPlanWrap {
@@ -147,11 +152,13 @@
     height: 100%;
 
     .editBtnDiv{
-      display: flex;
       width: 100%;
-      justify-content: center;
       margin-top: 10px;
       margin-bottom: 20px;
+      input{
+        margin-left: 10px;
+        width: 100px;
+      }
     }
     .lastLocDiv {
       border-bottom: 1px solid white;
@@ -224,7 +231,7 @@
 
         .detailDiv {
           textarea {
-            width: auto;
+            width: 98%;
             border-radius: 5px;
           }
         }
