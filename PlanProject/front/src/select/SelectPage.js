@@ -4,6 +4,7 @@ import styled from "./selectPage.module.scss";
 import loginCheck from "../check/loginCheck";
 import axiosPost from "../Axios/backAxiosPost";
 import Loading from "../loading/Loading";
+import Swal from "sweetalert2";
 
 const SelectPage = () => {
 
@@ -116,8 +117,32 @@ const SelectPage = () => {
     }, [pwdChangDiv])
 
     const deleteUser = async () => {
-        setLoading(true);
-        await axiosPost('/user/deleteUser',{}, '/');
+        Swal.fire({
+            title: '정말로 탈퇴하시겠습니까?',
+            text: "작성한 계획표들도 전부 삭제됩니다.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '삭제!',
+            cancelButtonText : '취소'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+
+                setLoading(true);
+                await axiosPost('/user/deleteUser',{}, '/');
+        
+                Swal.fire(
+                    '삭제 완료!!',
+                    '정상적으로 삭제되었습니다!.',
+                    'success'
+                  )
+
+
+              
+            }
+          })
+        
     }
 
     const [loading, setLoading] = useState(false);

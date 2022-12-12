@@ -6,6 +6,10 @@ const mongoose = require('mongoose'),
             type: Types.ObjectId,
             ref: 'Plan'
         },
+        day : {
+            type: Number,
+            require : true
+        },
         addr: {
             type: String,
             require: true

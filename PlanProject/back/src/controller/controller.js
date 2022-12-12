@@ -248,6 +248,7 @@ module.exports = {
         for(let {address, location, reservation, price, time, memo, lastLocation, lastAddress} of dayPlan){
             const dayplan = await Details.create({
                 _plan: id,
+                day,
                 addr: address,
                 location,
                 reser: reservation,
@@ -317,6 +318,7 @@ module.exports = {
             if (!id) {
                 const dayplan = await Details.create({
                     _plan: id,
+                    day,
                     addr: address,
                     location,
                     reser: reservation,
@@ -354,6 +356,7 @@ module.exports = {
         const daysArray = updateDays.concat(createDays);
 
         await Details.deleteMany({
+            day,
             _id: {
                 $nin: daysArray
             }

@@ -15,9 +15,10 @@ const CreateDiv = forwardRef(({Plan, DayPlan}, ref) => {
     }
 
     const getTimes = (day) => {
-        const days = new Date(day);
+        const Hour = Math.floor(day / 60);
+        const Minut = day - (60 * Hour);
         
-        return `${days.getHours()} 시 ${days.getMinutes()} 분`;
+        return `${Hour} 시 ${Minut} 분`;
     }
 
     const daysDetail = (days, idx) => {
@@ -28,11 +29,6 @@ const CreateDiv = forwardRef(({Plan, DayPlan}, ref) => {
         return getDate(startDate);
          
     }
-
-    const CreateMaps = (count) => {
-        SetMap(mapRef.current, count)
-    }
-    
     
     return (
         <div ref={ref} className={styled.pdfMain}>
@@ -102,23 +98,6 @@ const CreateDiv = forwardRef(({Plan, DayPlan}, ref) => {
 
                                             return (
                                                 <div className={styled.detailsDiv} key={idx}>
-                                                    {
-                                                    (!!last.addr)? 
-                                                    <>
-                                                        <p className={styled.detailsCount}> 마지막 도착지 </p>
-                                                        <div className={styled.information}>
-                                                            <div>
-                                                                <p> 이름 : </p>
-                                                                <p> {last.location} </p>
-                                                            </div>
-                                                            <div>
-                                                                <p> 주소 : </p>
-                                                                <p> {last.addr} </p>
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                    :
-                                                    <>
                                                     <p className={styled.detailsCount}> {idx + 1} 번째 일정 </p>
                                                     <div className={styled.information}>
                                                         <div>
@@ -129,30 +108,47 @@ const CreateDiv = forwardRef(({Plan, DayPlan}, ref) => {
                                                             <p> 주소 : </p>
                                                             <p> {addr} </p>
                                                         </div>
+                                                        { (idx === 0 ) ? null :
+                                                            <>
+                                                                <div>
+                                                                    <p> 가격 : </p>
+                                                                    <p> {price} 원 </p>
+                                                                </div>
+                                                                <div>
+                                                                    <p> 예약 : </p>
+                                                                    <p> {(reser)? 'YES' : 'NO'} </p>
+                                                                </div>
+                                                            </>
+                                                        }
                                                         <div>
-                                                            <p> 가격 : </p>
-                                                            <p> {price} 원 </p>
+                                                            <p> {(idx === 0)? '출발시간' : '활동'} : </p>
+                                                            <p> {(idx === 0)? getTimes(time) : `${time} 분`}  </p>
                                                         </div>
                                                         <div>
-                                                            <p> 예약 : </p>
-                                                            <p> {(reser)? 'YES' : 'NO'} </p>
-                                                        </div>
-                                                        <div>
-                                                            <p> {(location === '출발지')? '출발시간' : '활동'} : </p>
-                                                            <p> {(location === '출발지')? getTimes(Plan.starting.time) : `${time} 분`}  </p>
-                                                        </div>
-                                                        <div>
-                                                            <p> 메모 : </p>
-                                                            <p> {(memo)? memo : '없음'} </p>
+                                                            <p> 메모 :</p>
+                                                            <p className={styled.memoStyle}>{(memo)? memo : '없음'} </p>
                                                         </div>
                                                     </div>
-                                                    </>
-                                                    }
                                                 </div>
                                             );
                                             
                                         })
                                     }
+                                    {(!!details[0]?.last.addr)? 
+                                    <div className={styled.detailsDiv}>
+                                        <p className={styled.detailsCount}> 마지막 도착지 </p>
+                                        <div className={styled.information}>
+                                            <div>
+                                                <p> 이름 : </p>
+                                                <p> {details[0]?.last.location} </p>
+                                            </div>
+                                            <div>
+                                                <p> 주소 : </p>
+                                                <p> {details[0]?.last.addr} </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                : null}
                                 </div>
                             </div>
                         );
@@ -184,7 +180,7 @@ const ViewPlans = () => {
         const imgSize = doc.getImageProperties(img);
 
         const imgHeight = imgSize.height;
-        const size = 900;
+        const size = 1200;
 
         const maxHeight = Math.ceil((imgHeight / size))
 

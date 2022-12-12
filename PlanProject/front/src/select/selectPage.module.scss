@@ -85,6 +85,10 @@
                 height: 80%;
                 border-radius: 10px;
                 background-color: rgba(241, 209, 188, 0.877);
+                transition: transform 0.45s;
+                &:hover {
+                    transform:  scale(1.05);
+                }
             }
             button:nth-child(3){
                 position: absolute;

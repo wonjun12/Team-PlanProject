@@ -3,13 +3,15 @@ import { useParams } from "react-router-dom";
 import Styles from "./ViewPlan.module.scss";
 import Loading from '../loading/Loading';
 import axios from "axios";
-import { CreateLineMap, PullSearchMap, SetMap } from "../naver/NaverApi";
-import Directions from "../naver/Directions";
+import { CreateLineMap, SetMap } from "../naver/NaverApi";
 
-//////추가
 import ViewPlans from "../CreatePDF/CreatePDF";
 
 const ViewPlan = () => {
+
+  //PDF 
+  const pdfDown = ViewPlans();
+  const pdfRef = useRef();
 
   //nav translate
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,12 +43,10 @@ const ViewPlan = () => {
     view: 0,
   });
 
-
   //PlanData 가져오기
   const setPlanData = async () => {
-
+    setLoading(true);
     const res = await axios.get(`/back/plan/${id}/overallPlan`);
-
     setPlan(res.data.plan);
 
     //날짜 배열 set / view 변경
@@ -78,13 +78,23 @@ const ViewPlan = () => {
       dayArr[res.data.days[i]?._id.day] = res.data.days[i];
     }
 
-    //지도 경로 출력
-    await directionFnc(dayArr[0].details);
-
+    if (res.data.days?.length > 0) {
+      //지도 경로 출력
+      const dayPoint = res.data.days.find(isDaysView);
+      if(!!dayPoint){
+        CreateLineMap(res.data.days[navState.view]?.point);
+      }
+    }
+    setLoading(false);
     setDayPlan(dayArr);
     setNavState({ dateArr: arr, view: 0 });
   }
 
+  const isDaysView = (el) => {
+    if(el._id.day === navState.view){
+      return el
+    }
+  }
 
 
   //날짜 가져오기 
@@ -104,7 +114,7 @@ const ViewPlan = () => {
   //일자 계산
   const getDays = (start, end) => {
     const time = Math.abs(start.getTime() - end.getTime());
-    return Math.ceil(time / (1000 * 60 * 60 * 24));
+    return Math.ceil(time / (1000 * 60 * 60 * 24)) + 1;
   }
 
   //Nav 화살표 이동
@@ -119,73 +129,44 @@ const ViewPlan = () => {
     }
   }
 
-  //전체 경로 지도 출력 
-  const directionFnc = async (details) => {
-
-    let pointArr = []
-    let i = 0; // 잘 못 입력된 주소 idx
-    try {
-      setLoading(true);
-      setIsmap(true);
-      // if (details?.length > 0) {
-      //   for (let { addr } of details) {
-      //     //좌표 가져오기
-      //     const point = await PullSearchMap(addr);
-      //     pointArr.push(point);
-      //     i++;
-      //   }
-      //   //마지막 날짜인 경우 last 좌표를 마지막 배열에 넣는다
-      //   if (navState.view === navState.dateArr.length - 1) {
-      //     i = -1;
-      //     const point = await PullSearchMap(details[0].last.addr);
-      //     pointArr.push(point);
-      //     i = 0;
-      //   }
-
-      //   //전체 경로 정보 가져오기
-      //   const data = await Directions(pointArr);
-
-      //   //전체 경로 Line 그리기
-      //   await CreateLineMap(data.path);
-      // }else {
-      //   setIsmap(false);
-      // }
-      setLoading(false);
-    } catch (error) {
-      //console.log(error);
-      setIsmap(true);
-      setLoading(false);
-      return;
+  const moveNextFnc = () => {
+    if(navState.view !== navState.dateArr.length-1){
+      setNavState({...navState, view: navState.view+1});
     }
   }
 
   useEffect(() => {
     setOpen(0);
     setDetailCk(0);
-    //지도 경로 그리기
-    directionFnc(dayPlan[navState.view]?.details);
+
+    //지도 경로 출력
+    CreateLineMap(dayPlan[navState.view]?.point);
+
+    if (navState.view > 4 && navState.view > (currentIndex + 4)) {
+      setCurrentIndex(navState.view - 4);
+    } else if (navState.view < 5 && navState.view <= (currentIndex + 5)) {
+      setCurrentIndex(0);
+    }
+
   }, [navState.view])
+
+  const PDFDownload = async () => {
+    setLoading(true);
+    await pdfDown.douwnloadPDF(pdfRef, '계획표 다운로드');
+    setLoading(false);
+  }
 
   useEffect(() => {
     setPlanData();
   }, []);
 
-
-  
-  ///추가
-  const pdfDown = ViewPlans();
-  ////추가
-  const pdfRef = useRef();
-
   return (
     <>
       {loading && <Loading />}
-      {/* ////추가 */}
-      <div style={{position:'absolute',left:'9999%', height:'auto'}}>
+      <div style={{ position: 'absolute', left: '9999%', height: 'auto' }}>
         {pdfDown.MainDiv(pdfRef, plan, dayPlan)}
       </div>
-      {/* //// */}
-      <div className={Styles.container} >
+      <div className={Styles.container}>
         <div className={Styles.navDiv}>
           <span className={Styles.prevBtn} onClick={navPrevFnc}>◀</span>
           <span className={Styles.nextBtn} onClick={navNextFnc}>▶</span>
@@ -213,9 +194,7 @@ const ViewPlan = () => {
 
         <div className={Styles.titleDiv}>
           <h2>{plan.title}</h2>
-          <input type='button' value='수정하기' 
-          /////////////////추가 (다운로드 시작됨)
-            onClick={() => {pdfDown.douwnloadPDF(pdfRef, '계획표 다운로드')}}/>
+          <input type='button' value='PDF Print' onClick={PDFDownload} />
         </div>
 
         <div className={Styles.dayPlanWrap}>
@@ -249,7 +228,11 @@ const ViewPlan = () => {
               return (
                 <div className={Styles.planDiv} key={idx}>
                   <div className={Styles.openDiv}>
-                    <h3>{idx + 1}번째 일정</h3>
+                    {idx > 0 ? (
+                      <h3>{idx}번째 일정</h3>
+                    ) : (
+                      <h3>출발지</h3>
+                    )}
                     <span className={Styles.openSpan} onClick={() => setOpen(idx)}>
                       {(open === idx) ? '●' : '▼'}
                     </span>
@@ -260,24 +243,33 @@ const ViewPlan = () => {
                         <h3>{obj.location}</h3>
                         <p>{obj.addr}</p>
                       </div>
-
-                      <div className={Styles.timeDiv}>
-                        <h3>활동 시간</h3>
-                        <p>{hour}시간 {minute}분</p>
-                      </div>
-
+                      {idx > 0 ? (
+                        <div className={Styles.timeDiv}>
+                          <h3>활동 시간</h3>
+                          <p>{hour}시간 {minute}분</p>
+                        </div>
+                      ) : (
+                        <div className={Styles.timeDiv}>
+                          <h3>출발 시간</h3>
+                          <p>{hour}시 {minute}분</p>
+                        </div>
+                      )}
                       <div className={Styles.detailBtnDiv}>
-                        <h3>상세 일정</h3>
+                        {idx > 0 ? (<h3>상세 일정</h3>) : (<h3>메모</h3>)}
                         <span onClick={() => setDetailCk(!detailCk)}>
                           {(detailCk) ? '▲' : '▼'}
                         </span>
                       </div>
                       {(detailCk === true) && (
                         <div className={Styles.detailDiv}>
-                          {obj.reservation && <h3>예약 OK</h3>}
-                          <h3>예상 가격</h3>
-                          <p>{obj.price}</p>
-                          <h3>메모</h3>
+                          {idx > 0 && (
+                            <>
+                              {obj.reservation && <h3>예약 OK</h3>}
+                              <h3>예상 가격</h3>
+                              <p>{obj.price}</p>
+                            </>
+                          )}
+                          {idx > 0 && (<h3>메모</h3>)}
                           <textarea rows='5' value={obj.memo} disabled />
                         </div>
                       )}
@@ -285,6 +277,12 @@ const ViewPlan = () => {
                 </div>
               );
             })}
+            <div className={Styles.editBtnDiv}>
+              <input className={Styles.editBtn} type='button' value='수정하기'
+                onClick={() => window.location.href = `/editplan/${id}`} />
+              <input className={Styles.editBtn} type='button' value='다음'
+                onClick={moveNextFnc} />
+            </div>
           </div>
         </div>
       </div>

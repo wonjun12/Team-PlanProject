@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import axiosGet from '../Axios/backAxiosGet';
 import axiosPost from '../Axios/backAxiosPost';
 import styled from './MyPage.module.scss';
-import {Route, Routes, useNavigate} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import Loading from '../loading/Loading';
+import Swal from 'sweetalert2';
 
 const MyPage = () => {
     const navigate = useNavigate();
@@ -63,15 +64,39 @@ const MyPage = () => {
     }
 
     const deletePlan = async (id) => {
-        setLoading(true);
-        const data = await axiosPost('/plan/deletePlan', {
-            PlanId : id
-        })
 
-        if(data.result){
-            await getPlan();
-            setLoading(false);
-        }
+        Swal.fire({
+            title: '정말로 삭제하시겠습니까?',
+            text: "삭제 후 되돌릴수 없습니다!!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '삭제!',
+            cancelButtonText : '취소'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+
+                setLoading(true);
+                const data = await axiosPost('/plan/deletePlan', {
+                    PlanId : id
+                })
+        
+                if(data.result){
+                    await getPlan();
+                    setLoading(false);
+
+                    Swal.fire(
+                        '삭제 완료!!',
+                        '정상적으로 삭제되었습니다!.',
+                        'success'
+                      )
+                }
+
+              
+            }
+          })
+        
     }
 
     useEffect(() => {

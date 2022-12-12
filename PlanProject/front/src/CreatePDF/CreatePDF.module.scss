@@ -144,6 +144,8 @@
         border: 0.7px dotted black;
         width: 98%;
         margin-bottom: 5px;
+        padding-top: 15px;
+        padding-bottom: 15px;
         div{
             width: 100%;
             padding-left: 5px;
@@ -155,4 +157,8 @@
             }
         }
     }
+}
+
+.memoStyle{
+    white-space:pre;
 }
