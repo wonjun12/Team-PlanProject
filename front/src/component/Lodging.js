@@ -3,6 +3,7 @@ import Styles from "./Lodging.module.scss";
 import { SetMap, SearchMap, PullSearchMap, CreateLineMap } from '../naver/NaverApi';
 import Directions from "../naver/Directions";
 import { StartContext } from "./SetPlan";
+import Swal from 'sweetalert2';
 
 const Lodging = () => {
 
@@ -75,7 +76,11 @@ const Lodging = () => {
       return data;
     } catch (error) {
       console.log(error);
-      alert('주소를 다시 확인해주세요!');
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '주소를 다시 입력해주세요',
+      })
       return false;
     }
   }
@@ -101,7 +106,11 @@ const Lodging = () => {
 
     } catch (error) {
       setLoading(false);
-      alert('주소를 다시 확인해 주세요');
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '주소를 다시 입력해주세요',
+      })
       return;
     }
 
@@ -120,7 +129,11 @@ const Lodging = () => {
       let copy = [...log];
       copy[idx].address = ""
       setLog(copy)
-      alert('주소를 다시 검색해주세요');
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '주소를 다시 입력해주세요',
+      })
     }
   }
 

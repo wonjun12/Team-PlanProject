@@ -7,6 +7,7 @@ import Lodging from "./Lodging"; //숙소
 
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 export const StartContext = createContext();
 
@@ -179,7 +180,11 @@ const SetPlan = ({ editCk, setLoading, loading }) => {
           newPlanPostFnc();
         }
       } else {
-        alert('필수 입력값을 다시 확인 해주세요');
+        Swal.fire({
+          icon: 'error',
+          title: '오류',
+          text: '필수 입력란을 다시 입력해주세요',
+        })
       }
     }
     console.log('plan', plan);

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Styles from "./Start.module.scss";
 import { SetMap, SearchMap } from '../naver/NaverApi';
+import Swal from 'sweetalert2';
 
 import { StartContext } from "./SetPlan";
 
@@ -31,7 +32,11 @@ const Start = () => {
         ...prev,
         address: "",
       }))
-      alert('주소를 다시 검색해주세요');
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '주소를 다시 입력해주세요',
+      })
     } else {
       setNavState('STEP3');
       setPlan({
@@ -56,7 +61,11 @@ const Start = () => {
         ...prev,
         address: "",
       }))
-      alert('주소를 다시 검색해주세요');
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '주소를 다시 입력해주세요',
+      })
     }
   }
 

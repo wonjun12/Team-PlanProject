@@ -5,6 +5,7 @@ import Styles from "./DayPlan.module.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import { SetMap, SearchMap, CreateLineMap, PullSearchMap } from '../naver/NaverApi';
 import Directions from '../naver/Directions';
+import Swal from 'sweetalert2';
 
 const DayPlans = () => {
 
@@ -141,7 +142,11 @@ const DayPlans = () => {
     } catch (error) {
       console.log(error);
       setLoading(false);
-      alert('주소를 다시 확인해주세요!');
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '주소를 다시 입력해주세요',
+      })
       return false;
     }
   }
@@ -285,7 +290,11 @@ const DayPlans = () => {
         address: "",
       }
       setDayPlan(copy);
-      alert('주소를 다시 검색해주세요');
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: '주소를 다시 입력해주세요',
+      })
     }
   }
 

@@ -59,7 +59,6 @@ module.exports = {
         } catch (error) {
             res.json({result:false}).end();
         }
-        
     },
     //비밀번호 찾기 이메일 보내기
     sendPwd: async (req, res) => {
@@ -100,7 +99,6 @@ module.exports = {
     userPwdChange: async (req, res) => {
         const {loginID} = req.session;
         const {hash, password} = req.body;
-
 
         try {
 
@@ -248,7 +246,7 @@ module.exports = {
         for(let {address, location, reservation, price, time, memo, lastLocation, lastAddress} of dayPlan){
             const dayplan = await Details.create({
                 _plan: id,
-                day, //소진 추가
+                day,
                 addr: address,
                 location,
                 reser: reservation,
@@ -298,7 +296,7 @@ module.exports = {
 
         res.json({result: true, dayPlan}).end();
     },
-    //일자별 계획 수정  //소진 수정
+    //일자별 계획 수정
     editDayPlan: async (req, res) => {
         const { id } = req.params;
         const planId = id;
@@ -318,7 +316,7 @@ module.exports = {
             if (!id) {
                 const dayPlans = await Details.create({
                     _plan: planId,
-                    day, //소진 추가
+                    day, 
                     addr: address,
                     location,
                     reser: reservation,
@@ -354,7 +352,7 @@ module.exports = {
         const daysArray = updateDays.concat(createDays);
 
         await Details.deleteMany({
-            day, //소진 추가
+            day, 
             _id: {
                 $nin: daysArray
             },
@@ -567,7 +565,6 @@ module.exports = {
             }
         }]);
 
-        //소진 수정
         const days = await Calendar.find({
             '_id.plan' : id
         }).populate({
