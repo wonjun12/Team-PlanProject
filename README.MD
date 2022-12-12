@@ -1,7 +1,7 @@
 <div align="center">
     <h1>Team - Plan Project  </h1>
     <br><br>
-    <h3> 국내여행 여행 계획표 작성 사이트 </h3>
+    <h3> 국내 여행 계획표 작성 사이트 </h3>
     <br>
     <h3> Front-end </h3> <br>
     <img src="https://img.shields.io/badge/Create React App-09D3AC?style=flat&logo=Create React App&logoColor=white" /> 
