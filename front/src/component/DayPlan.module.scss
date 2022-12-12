@@ -85,6 +85,10 @@
           font-size: 22px;
           top: -8px;
           right: 0;
+          transition: 0.3s ease-in-out;
+          &:hover {
+            color: black;
+          }
         }
       }
       border-bottom: 1px solid white;
@@ -158,6 +162,10 @@
           font-size: 22px;
           top: -8px;
           right: 0;
+          transition: 0.3s ease-in-out;
+          &:hover {
+            color: black;
+          }
         }
       }
 

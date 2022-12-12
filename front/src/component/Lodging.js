@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Styles from "./Lodging.module.scss";
-import { SetMap, SearchMap, PullSearchMap, CreateLineMap, Map } from '../naver/NaverApi';
+import { SetMap, SearchMap, PullSearchMap, CreateLineMap } from '../naver/NaverApi';
 import Directions from "../naver/Directions";
-import { PlanContext } from "../context/PlanContext";
+import { StartContext } from "./SetPlan";
 
 const Lodging = () => {
 
-  const { plan, setPlan, setLoading } = useContext(PlanContext);
+  const { navState, setNavState, plan, setPlan, editCk, setLoading } = useContext(StartContext);
 
   //숙소 open index
   const [open, setOpen] = useState(0);
@@ -60,43 +60,48 @@ const Lodging = () => {
     }
   }
 
+  //경로 좌표 가져오기
+  const getPath = async (plan) => {
+
+    let pointArr = [];
+    try {
+      for (let i = 0; i < plan.length; i++) {
+        //좌표 가져오기
+        const point = await PullSearchMap(plan[i].address);
+        pointArr.push(point);
+      }
+      //전체 경로 정보 가져오기
+      const data = await Directions(pointArr);
+      return data;
+    } catch (error) {
+      console.log(error);
+      alert('주소를 다시 확인해주세요!');
+      return false;
+    }
+  }
+
   // 완료 버튼 > 주소 유효성 + 지도 경로 + 전역변수에 저장
   const hotelPostFnc = async () => {
 
     setLoading(true);
-    let pointArr = []
-    let i = 0; // 잘 못 입력된 주소 idx
     try {
-      for (let { address } of log) {
-        const point = await PullSearchMap(address);
-        pointArr.push(point);
-        i++;
-      }
-
       if (log?.length > 1) {
-        const data = await Directions(pointArr);
+
+        const data = await getPath(log);
         CreateLineMap(data.path);
+      } else {
+        const result = SearchMap(log[0].address);
       }
 
       setPlan({
         ...plan,
         lodging: log,
-      })
-
+      });
       setLoading(false);
 
     } catch (error) {
-
       setLoading(false);
-      alert('주소를 다시 검색해주세요');
-      let copy = [...log];
-      copy[i] = {
-        ...copy[i],
-        address: "",
-      }
-      setLog(copy);
-      setOpen(i);
-
+      alert('주소를 다시 확인해 주세요');
       return;
     }
 
@@ -119,15 +124,26 @@ const Lodging = () => {
     }
   }
 
-  useEffect(() => {
-    setLog(plan.lodging);
-    //주소 값이 있으면 지도 표시
+  const startLine = async () => {
+    setLoading(true);
     try {
-      if (plan.lodging[0].address !== '') {
-        SearchMap(plan.lodging[0].address);
+      if (editCk) {
+        if (plan.lodging.length < 2) {
+          await SearchMap(plan.lodging[0].address);
+        } else {
+          const data = await getPath(plan.lodging);
+          CreateLineMap(data.path);
+        }
       }
     } catch (error) {
     }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    setLog(plan.lodging);
+    //주소 값이 있으면 지도 표시
+    startLine();
   }, []);
 
   return (

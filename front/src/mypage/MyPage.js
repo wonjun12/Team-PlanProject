@@ -50,7 +50,8 @@ const MyPage = () => {
     const setDate = (day) => {
         const weeks = ['일', '월', '화', '수', '목', '금', '토']
         const days = new Date(day);
-        return `${days.getFullYear()}-${days.getMonth()}-${days.getDay()} (${weeks[days.getDay()]})`
+        {/* 소진 수정 */}
+        return `${days.getFullYear()}-${days.getMonth()+1}-${days.getDate()} (${weeks[days.getDay()]})`
     }
 
     const getPlan = async () => {
@@ -107,7 +108,8 @@ const MyPage = () => {
                                 <span onClick={() => {deletePlan(_id)}}> 
                                     삭제 
                                 </span>
-                                <button onClick={() => toHref(`./${_id}`)}>
+                                {/* 소진 수정 */}
+                                <button onClick={() => toHref(`/viewplan/${_id}`)}>
                                     보기
                                 </button>
                             </div>

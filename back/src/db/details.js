@@ -1,10 +1,15 @@
 const mongoose = require('mongoose'),
     {Types} = mongoose;
 
+    //소진 추가
     const DetailsSchema = new mongoose.Schema({
         _plan : {
             type: Types.ObjectId,
             ref: 'Plan'
+        },
+        day: {
+            type: Number,
+            require: true
         },
         addr: {
             type: String,

@@ -66,7 +66,7 @@ function App() {
 
             <Route path="/newplan/*" element={<NewPlan />}></Route>
 
-            <Route path="/editplan/:id/*" element={<EditPlan />}></Route>
+            <Route path="/editplan/*" element={<EditPlan />}></Route>
 
             <Route path="/mypage" element={<MyPage/>}></Route>
             

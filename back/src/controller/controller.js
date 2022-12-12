@@ -248,6 +248,7 @@ module.exports = {
         for(let {address, location, reservation, price, time, memo, lastLocation, lastAddress} of dayPlan){
             const dayplan = await Details.create({
                 _plan: id,
+                day, //소진 추가
                 addr: address,
                 location,
                 reser: reservation,
@@ -260,7 +261,6 @@ module.exports = {
                     location : lastLocation
                 }
             });
-            
             calender.details.push(dayplan);
         }
 
@@ -298,14 +298,15 @@ module.exports = {
 
         res.json({result: true, dayPlan}).end();
     },
-    //일자별 계획 수정
+    //일자별 계획 수정  //소진 수정
     editDayPlan: async (req, res) => {
         const { id } = req.params;
+        const planId = id;
         const { dayPlan, day, point, distance, duration } = req.body;
 
         await Calendar.updateOne({
             '_id.day' : day,
-            '_id.plan' : id
+            '_id.plan' : planId
         }, {
             point,
             distance,
@@ -315,8 +316,9 @@ module.exports = {
         let count = 0, updateDays = [], createDays = [];
         for (let { id, address, location, reservation, price, time, memo, lastLocation, lastAddress } of dayPlan) {
             if (!id) {
-                const dayplan = await Details.create({
-                    _plan: id,
+                const dayPlans = await Details.create({
+                    _plan: planId,
+                    day, //소진 추가
                     addr: address,
                     location,
                     reser: reservation,
@@ -329,8 +331,7 @@ module.exports = {
                         location: lastLocation
                     }
                 });
-
-                createDays.push(dayPlan);
+                createDays.push(dayPlans._id);
             } else {
                 await Details.updateOne({
                     _id: id
@@ -350,18 +351,18 @@ module.exports = {
                 updateDays.push(id);
             }
         }
-
         const daysArray = updateDays.concat(createDays);
 
         await Details.deleteMany({
+            day, //소진 추가
             _id: {
                 $nin: daysArray
-            }
-        })
+            },
+        });
 
         await Calendar.updateOne({
             '_id.day' : day,
-            '_id.plan' : id
+            '_id.plan' : planId
         }, {
             $pull: {
                 details: {
@@ -372,7 +373,7 @@ module.exports = {
 
         await Calendar.updateOne({
             '_id.day' : day,
-            '_id.plan' : id
+            '_id.plan' : planId
         }, {
             $push: {
                 details: {
@@ -380,7 +381,6 @@ module.exports = {
                 }
             }
         }) 
-        
         res.json({result: true}).end();
     },
     //타이틀 플랜 수정

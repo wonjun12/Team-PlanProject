@@ -1,94 +1,159 @@
-import React, { useContext, useEffect, useState } from "react";
-import Styles from "./SetPlan.module.scss";
-import SetDate from "./SetDate";
-import Start from "./Start";
-import Lodging from "./Lodging";
-import { PlanContext } from "../context/PlanContext";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useEffect, useState } from "react";
+
+import { StartNav } from './PlanNav'; //네비
+import SetDate from "./SetDate"; //날짜
+import Start from "./Start"; //출발지
+import Lodging from "./Lodging"; //숙소
+
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-const SetPlan = () => {
+export const StartContext = createContext();
+
+const initPlan = {
+  PID: "", //게시글PID
+  baseData: {
+    //여행 기본 정보
+    start: '',
+    end: '',
+    days: 0,
+    title: '',
+  },
+  startPlan: {
+    //출발 정보
+    id: '',
+    address: "",
+    time: "",
+    transportation: "car",
+    memo: "",
+  },
+  lodging: [{
+    //숙소 정보
+    id: '',
+    address: "",
+    check_in: "",
+    check_out: "",
+    reservation: false,
+    price: "",
+    memo: "",
+  }]
+}
+
+const SetPlan = ({ editCk, setLoading, loading }) => {
 
   const navigate = useNavigate();
-  const { navState, setNavState, plan, setPlan, baseEditCk, } = useContext(PlanContext);
 
-  //DB에 plan을 생성, 수정 하고 만들어진 id를 front obj에 저장
-  const saveID = (resPlan) => {
-    //각각의 숙소 id를 가져오기 위해 복사
-    let copyLodgingArr = [];
-    let copyLodging = {};
-    if (resPlan.lodging.length > 0) {
-      for (let i = 0; i < resPlan.lodging.length; i++) {
-        copyLodging = {
-          id: resPlan.lodging[i]._id,
-          address: plan.lodging[i].address,
-          check_in: plan.lodging[i].check_in,
-          check_out: plan.lodging[i].check_out,
-          reservation: plan.lodging[i].reservation,
-          price: plan.lodging[i].price,
-          memo: plan.lodging[i].memo,
-        }
-        copyLodgingArr.push(copyLodging);
-      }
+  //edit 일경우 플랜 id 를 가져온다
+  const { id } = useParams();
+
+  //네비
+  const [navState, setNavState] = useState('STEP1');
+
+  //여행 시작 계획
+  const [plan, setPlan] = useState(initPlan);
+
+  // date => hh:mm
+  const timeToStr = (dateStr) => {
+    const time = new Date(dateStr);
+    let hh = time.getHours();
+    hh = hh >= 10 ? hh : '0' + hh;
+    let mm = time.getMinutes();
+    mm = mm >= 10 ? mm : '0' + mm;
+    return `${hh}:${mm}`;
+  }
+
+  //plan 기본 정보 가져오기
+  const fetchData = async () => {
+    setLoading(true);
+    const res = await axios.get(`/back/plan/${id}/overallPlan`);
+    const plan = res.data.plan;
+
+    //숙소 정보
+    let arr = [];
+    for (let { _id, addr, check_in, check_out, reser, price, memo } of plan.lodging) {
+      const ckin = check_in.split('T');
+      const ckout = check_out.split('T');
+      arr.push({
+        id: _id,
+        address: addr,
+        check_in: ckin[0],
+        check_out: ckout[0],
+        reservation: reser,
+        price: price,
+        memo: memo,
+      })
     }
-    //각각의 id를 State에 담는다
+
+    //start 정보
+    const start = plan.start.split('T');
+    const end = plan.end.split('T');
+    const time = timeToStr(plan.starting.time);
+
+    const dateTime = Math.abs(new Date(plan.start).getTime() - new Date(plan.end).getTime());
+    const days = Math.ceil(dateTime / (1000*60*60*24)) + 1;
+
+    //plan state에 담가
     setPlan({
-      ...plan,
-      PID: resPlan._id,
-      startPlan: {
-        ...plan.startPlan,
-        id: resPlan.starting._id,
+      PID: id,
+      baseData: {
+        start: start[0],
+        end: end[0],
+        days: days,
+        title: plan.title,
       },
-      lodging: copyLodgingArr,
+      startPlan: {
+        id: plan.starting._id,
+        address: plan.starting.addr,
+        time,
+        transportation: plan.starting.trans,
+        memo: plan.starting.memo,
+      },
+      lodging: arr,
     });
+    setLoading(false);
   }
 
   //날짜, 출발지, 숙소 새로만들기 Post
   const newPlanPostFnc = async () => {
+    setLoading(true);
     const res = await axios.post('/back/plan', {
       SetPlan: plan.baseData,
       Start: plan.startPlan,
       lodging: plan.lodging,
     });
-
-    //ID 저장
-    saveID(res.data.plan);
-
-    setNavState({ ...navState, view: 0 });
-    navigate(`${res.data.plan._id}/0`);
+    navigate(`/newplan/${res.data.plan._id}/0`);
+    setLoading(false);
   }
 
   //날짜, 출발지, 숙소 수정하기 Post
   const editPlanPostFnc = async () => {
+    setLoading(true);
     const res = await axios.post('/back/plan/editPlan', {
       PlanId: plan.PID,
       SetPlan: plan.baseData,
       Start: plan.startPlan,
       lodging: plan.lodging,
     });
-
-    //ID 저장
-    saveID(res.data.plan);
-
-    setNavState({ ...navState, view: 0 });
-    navigate(`${plan.PID}/0`);
+    navigate(`/editplan/${res.data.plan._id}/0`);
+    // window.location.href = `/editplan/${res.data.plan._id}/0`;
+    setLoading(false);
   }
 
   //필수 정보 유효성 검사
   const dataConfirm = () => {
     if (plan.baseData.start === '' || plan.baseData.end === '') {
       //setDate 유효성
-      setNavState({ ...navState, view: 'STEP1' })
+      setNavState('STEP1');
       return false;
     } else if (plan.startPlan.address === '' || plan.startPlan.time === '') {
       //start 유효성
-      setNavState({ ...navState, view: 'STEP2' })
+      setNavState('STEP2');
       return false;
     } else if (plan.lodging.length > 0) {
       //lodging 유효성
       for (let { address, check_in, check_out } of plan.lodging) {
         if (address === '' || check_in === '' || check_out === '') {
-          setNavState({ ...navState, view: 'STEP3' })
+          setNavState('STEP3');
           return false;
         }
       }
@@ -99,10 +164,16 @@ const SetPlan = () => {
   }
 
   useEffect(() => {
-    if (navState.view === 'DayPlan') {
-      const res = dataConfirm();
-      if (res) {
-        if (baseEditCk) {
+    if (editCk) {
+      fetchData();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (navState === 'DayPlan') {
+      const result = dataConfirm();
+      if (result) {
+        if (editCk) {
           editPlanPostFnc();
         } else {
           newPlanPostFnc();
@@ -111,16 +182,16 @@ const SetPlan = () => {
         alert('필수 입력값을 다시 확인 해주세요');
       }
     }
-
     console.log('plan', plan);
-  }, [plan, navState.view])
+  }, [navState])
 
   return (
-    <div className={Styles.setPlanWrap}>
-      {(navState.view === "STEP1") && <SetDate />}
-      {(navState.view === "STEP2") && <Start />}
-      {(navState.view === "STEP3") && <Lodging />}
-    </div>
+    <StartContext.Provider value={{ plan, setPlan, navState, setNavState, editCk, setLoading }}>
+      <StartNav />
+      {(navState === 'STEP1' && !loading) && <SetDate />}
+      {(navState === 'STEP2') && <Start />}
+      {(navState === 'STEP3') && <Lodging />}
+    </StartContext.Provider>
   );
 }
 

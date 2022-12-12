@@ -43,7 +43,6 @@
           display: flex;
           align-items: center;
         }
-  
         .openSpan {
           cursor: pointer;
           position: absolute;
@@ -51,6 +50,10 @@
           font-size: 22px;
           top: -8px;
           right: 0;
+          transition: 0.3s ease-in-out;
+          &:hover {
+            color: black;
+          }
         }
       }
 
