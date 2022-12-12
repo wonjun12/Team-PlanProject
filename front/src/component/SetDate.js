@@ -78,6 +78,7 @@ const SetDate = () => {
   return (
     <div className={Styles.setDateWrap}>
       <Calendar
+        calendarType="US"
         onChange={changeDate}
         selectRange={true}
         value={calDate}
